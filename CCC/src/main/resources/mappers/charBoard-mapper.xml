@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="charBoardMapper">
+
+	<resultMap type="character" id="characterResultSet">
+		<result column="C_NO" property="charNo"/>
+		<result column="M_NO" property="memberNo"/>
+		<result column="CB_NO" property="refBno"/>
+		<result column="C_NAME" property="charName"/>
+		<result column="C_CONTENT" property="charContent"/>
+		<result column="C_LIKE" property="like"/>
+		<result column="C_CREATE_DATE" property="createDate"/>
+		<result column="C_STATUS" property="status"/>
+	</resultMap>
+
+	<resultMap type="charBoard" id="charBoardResultSet">
+		<result column="CB_NO" property="boardNo"/>
+		<result column="C_NO" property="charNo"/>
+		<result column="C_NAME" property="charName"/>
+		<result column="CB_WRITER" property="boardWriterNo"/>
+		<result column="CB_WRITER_NAME" property="boardWriterName"/>
+		<result column="CB_TITLE" property="boardTitle"/>
+		<result column="CB_CONTENT" property="boardContent"/>
+		<result column="CA_CHANGE_NAME" property="changeName"/>
+		<result column="CB_VIEWS" property="views"/>
+		<result column="CB_LIKE" property="like"/>
+		<result column="CB_CREATE_DATE" property="createDate"/>
+		<result column="CB_STATUS" property="status"/>
+	</resultMap>
+	
+	<resultMap type="charAttach" id="charAttachResultSet">
+		<result column="CA_NO" property="fileNo"/>
+		<result column="CB_NO" property="refBno"/>
+		<result column="CA_ORIGIN_NAME" property="originName"/>
+		<result column="CA_CHANGE_NAME" property="changeName"/>
+		<result column="CA_LEVEL" property="level"/>
+		<result column="CA_CREATE_DATE" property="createDate"/>
+		<result column="CA_STATUS" property="status"/>
+	</resultMap>
+	
+	<resultMap type="charLike" id="charLikeResultSet">
+		<result column="M_NO" property="memberNo"/>
+		<result column="C_NO" property="charNo"/>
+		<result column="C_LIKE" property="charLike"/>
+	</resultMap>
+	
+	<resultMap type="ward" id="wardResultSet">
+		<result column="W_NO" property="wardNo"/>
+		<result column="W_NAME" property="wardName"/>
+	</resultMap>
+	
+	<resultMap type="charReply" id="charReplyResultSet">
+		<result column="CR_NO" property="reNo"/>
+		<result column="CB_NO" property="refBno"/>
+		<result column="CR_CONTENT" property="reContent"/>
+		<result column="CR_WRITER" property="reWriterNo"/>
+		<result column="CR_WRITER_NAME" property="reWriterName"/>		
+		<result column="CR_GROUP_NO" property="reGroupNo"/>
+		<result column="CR_PARENT_NO" property="reParentNo"/>
+		<result column="CR_STEP" property="reStep"/>
+		<result column="CR_LEVEL" property="reLevel"/>
+		<result column="CR_CREATE_DATE" property="reCreateDate"/>
+		<result column="CR_STATUS" property="reStatus"/>		
+	</resultMap>
+	
+	<!-- 1.게시글 조회수 증가 -->
+	<update id="increaseCount" parameterType="_int">
+		UPDATE TB_CHARACTER_BOARD
+		SET CB_VIEWS = CB_VIEWS +1
+		WHERE CB_NO = #{ bno }
+		AND CB_STATUS = 'Y'
+	</update>
+	
+	<!-- 2.게시글 상세 조회 (글) -->
+	<select id="selectBoard" resultMap="charBoardResultSet" parameterType="_int">
+		SELECT CB_NO
+		      ,C_NAME
+		      ,C_NO
+		      ,M_NAME AS CB_WRITER_NAME
+		      ,CB_WRITER
+		      ,CB_TITLE
+		      ,CB_CONTENT
+		      ,CB_CREATE_DATE
+		FROM TB_CHARACTER_BOARD
+		JOIN TB_MEMBER ON(M_NO = CB_WRITER)
+		WHERE CB_STATUS = 'Y'
+		AND CB_NO = #{ bno }
+	</select>
+	
+	<!-- 3.게시글 상세 조회 (첨부파일) -->
+	<select id="selectAttach" resultMap="charAttachResultSet" parameterType="_int">
+		SELECT CA_NO
+			  ,CB_NO
+			  ,CA_ORIGIN_NAME
+			  ,CA_CHANGE_NAME
+			  ,CA_LEVEL
+			  ,CA_STATUS
+		FROM TB_CHARACTER_ATTACH
+		WHERE CA_STATUS = 'Y'
+		AND CB_NO = #{ bno }
+		ORDER BY CA_LEVEL ASC
+	</select>
+	
+	<!-- 전체 개시글 수 반환 -->
+	<select id="selectListCount" resultType="_int">
+		SELECT COUNT(*)
+		FROM TB_CHARACTER_BOARD
+	</select>
+	
+	<!-- 1.검색 게시글 수 반환 -->
+	<select id="searchCount" resultType="_int" parameterType="hashMap">
+		SELECT COUNT(*)
+		FROM TB_CHARACTER_BOARD
+		JOIN TB_MEMBER ON(CB_WRITER = M_NO)
+		WHERE CB_STATUS = 'Y'
+		<choose>
+			<when test="condition == 'writer'">
+				<!-- 창작자 -->
+				AND M_ID
+			</when>
+			<when test="condition == 'title'">
+				<!-- 캐릭터이름 -->
+				AND C_NAME
+			</when>
+			<otherwise>
+				<!-- 캐릭터 설명 -->
+				AND CB_CONTENT
+			</otherwise>
+		</choose>
+		<!-- 공통 구문 -->
+		LIKE '%'||#{ keyword }||'%'
+	</select>
+	
+	<!-- 2.검색 게시글의 리스트 반환 -->
+	<select id="charBoardSearch" resultMap="charBoardResultSet" parameterType="hashMap">
+		SELECT CB_NO
+		      ,M_ID AS CB_WRITER_NAME
+		      ,C_NAME
+		      ,CB_TITLE
+		      ,CB_CONTENT
+		      ,CA_CHANGE_NAME
+		      ,CA_LEVEL
+		      ,CB_VIEWS
+		      ,CB_LIKE
+		      ,CB_CREATE_DATE
+		FROM TB_CHARACTER_BOARD
+		JOIN TB_CHARACTER_ATTACH USING(CB_NO)
+		JOIN TB_MEMBER ON(CB_WRITER = M_NO)
+		WHERE CB_STATUS = 'Y'
+		AND CA_STATUS = 'Y'
+		AND CA_LEVEL = 1
+		<choose>
+			<when test="condition == 'writer'">
+				AND M_ID		
+			</when>
+			<when test="condition == 'title'">
+				AND C_NAME
+			</when>
+			<otherwise>
+				AND CB_CONTENT
+			</otherwise>
+		</choose>
+		LIKE '%'||#{ keyword }||'%'
+		ORDER BY CB_CREATE_DATE DESC
+	</select>
+	
+	<!-- 게시글 리스트 조회 -->
+	<select id="selectList" resultMap="charBoardResultSet">
+		SELECT CB_NO
+		      ,CB_WRITER
+		      ,C_NAME
+		      ,CB_TITLE
+		      ,CB_CONTENT
+		      ,CA_CHANGE_NAME
+		      ,CA_LEVEL
+		      ,CB_VIEWS
+		      ,CB_LIKE
+		      ,CB_CREATE_DATE
+		FROM TB_CHARACTER_BOARD
+		JOIN TB_CHARACTER_ATTACH USING(CB_NO)
+		WHERE CB_STATUS = 'Y'
+		AND CA_STATUS = 'Y'
+		AND CA_LEVEL = 1
+		ORDER BY CB_CREATE_DATE DESC
+	</select>
+	
+	<!-- 로그인 유저가 좋아요한 목록 조회 -->
+	<select id="checkLikeList" resultMap="charLikeResultSet" parameterType="_int">
+		SELECT C_NO, C_LIKE
+		FROM TB_CHARACTER_LIKE
+		WHERE M_NO = #{ boardNo }
+	</select>
+		
+	<!-- 게시글 등록 (글) -->
+	<insert id="insertBoard" parameterType="charBoard">
+		INSERT INTO TB_CHARACTER_BOARD(
+									   CB_NO
+									  ,C_NO
+									  ,C_NAME
+									  ,CB_WRITER
+									  ,CB_TITLE
+									  ,CB_CONTENT)
+					VALUES(SEQ_CBNO.NEXTVAL
+						  ,SEQ_CNO.CURRVAL
+						  ,#{ charName }
+						  ,#{ boardWriterNo }
+						  ,#{ boardTitle }
+						  ,#{ boardContent })
+	</insert>
+
+	<!-- 캐릭터 등록  -->
+	<insert id="insertCharacter" parameterType="character">
+		INSERT INTO TB_CHARACTER(
+								 C_NO
+								,M_NO
+								,C_NAME
+								,C_CONTENT)
+		VALUES(
+			   SEQ_CNO.NEXTVAL,
+			   #{ memberNo },
+			   #{ charName },
+			   #{ charContent })
+	</insert>
+	
+	<!-- 게시글 등록 (첨부파일) -->
+	<insert id="insertAttach" parameterType="java.util.List">
+		INSERT INTO TB_CHARACTER_ATTACH(
+									    CA_NO
+									   ,CB_NO
+									   ,CA_ORIGIN_NAME
+									   ,CA_CHANGE_NAME
+									   ,CA_LEVEL)
+		SELECT SEQ_CANO.NEXTVAL,SEQ_CBNO.CURRVAL, A.*
+		FROM(
+			 <foreach collection="list" item="list" index="index" separator="union all">
+			 		SELECT #{ list.originName }
+			 			  ,#{ list.changeName }
+			 			  ,#{ list.level }
+			 		FROM SYS.DUAL
+			 </foreach>
+			 )A
+	</insert>
+	
+	<!-- 1.게시글 수정 (기존 첨부파일 삭제) -->
+	<delete id="deleteCharAttachByCaNo" parameterType="charAttach">
+		DELETE FROM TB_CHARACTER_ATTACH
+		WHERE CB_NO = #{ refBno }
+		AND CA_LEVEL = #{ level }
+	</delete>
+	
+	<!-- 2.게시글 수정 (게시글 정보) -->
+	<update id="updateCb" parameterType="charBoard">
+		UPDATE TB_CHARACTER_BOARD
+		SET CB_TITLE = #{ boardTitle },
+			CB_CONTENT = #{ boardContent },
+			C_NAME = #{ charName },
+			CB_CREATE_DATE = SYSDATE
+		WHERE CB_NO = #{ boardNo }
+	</update>
+	
+	<!-- 3.캐릭터 수정 (캐릭터 정보) -->
+	<update id="updateCharacter" parameterType="character">
+		UPDATE TB_CHARACTER
+		SET C_NAME = #{ charName },
+			C_CONTENT = #{ charContent },
+			C_CREATE_DATE = SYSDATE
+		WHERE C_NO = #{ charNo }
+	</update>
+	
+	<!-- 4.게시판 수정 (첨부파일) -->
+	<insert id="updateCaList" parameterType="java.util.List">
+		INSERT INTO TB_CHARACTER_ATTACH(
+									    CA_NO
+									   ,CB_NO
+									   ,CA_ORIGIN_NAME
+									   ,CA_CHANGE_NAME
+									   ,CA_LEVEL)
+		SELECT SEQ_CANO.NEXTVAL, A.*
+		FROM(
+			 <foreach collection="list" item="list" index="index" separator="union all">
+			 		SELECT #{ list.refBno }
+			 			  ,#{ list.originName }
+			 			  ,#{ list.changeName }
+			 			  ,#{ list.level }
+			 		FROM SYS.DUAL
+			 </foreach>
+			 )A
+	</insert>
+
+	<!-- 게시글 수정 (기존 첨부파일 모두 삭제하는 경우 -->
+	<delete id="deleteAllOldAttach" parameterType="_int">
+		DELETE FROM TB_CHARACTER_ATTACH
+		WHERE CB_NO = #{ boardNo }
+	</delete>
+
+	<!-- 1.게시글 삭제 (글) -->
+	<update id="deleteBoard" parameterType="_int">
+		UPDATE TB_CHARACTER_BOARD
+		SET CB_STATUS = 'N'
+		WHERE CB_NO = #{ bno }
+	</update>
+	
+	<!-- 2.게시글 삭제 (첨부파일) -->
+	<delete id="deleteAttach" parameterType="_int">
+			DELETE FROM TB_CHARACTER_ATTACH
+			WHERE CB_NO = #{ bno }
+	</delete>
+	
+	<!-- 좋아요 조회 (TB_CHARACTER_LIKE) -->
+	<select id="selectLike" resultMap="charLikeResultSet" parameterType="charLike">
+		SELECT COUNT(C_LIKE) AS C_LIKE
+		FROM TB_CHARACTER_LIKE
+		WHERE C_NO = #{ refBno }
+		AND M_NO = #{ memberNo }
+	</select>
+	
+	<!-- 좋아요 추가(TB_CHARACTER_LIKE) -->
+	<insert id="insertTbCharLike" parameterType="charLike">
+		INSERT INTO TB_CHARACTER_LIKE(
+									  M_NO
+									 ,C_NO
+									 ,C_LIKE)
+					VALUES(
+						   #{ memberNo },
+						   #{ refBno },
+						   1)
+	</insert>
+	
+	<!-- 좋아요 추가 (TB_CHARACTER) -->
+	<update id="insertTbChar" parameterType="charLike">
+		UPDATE TB_CHARACTER
+		SET C_LIKE = C_LIKE + 1
+		WHERE C_NO = #{ refBno }
+	</update>
+	
+	<!-- 좋아요 추가 (TB_CHARACTER_BOARD) -->
+	<update id="insertTbCharBoard" parameterType="charLike">
+		UPDATE TB_CHARACTER_BOARD
+		SET CB_LIKE = CB_LIKE + 1
+		WHERE CB_NO = #{ refBno }
+	</update>
+
+	<!-- 좋아요 삭제 (TB_CHARACTER_LIKE) -->
+	<delete id="deleteTbCharLike" parameterType="charLike">
+		DELETE FROM TB_CHARACTER_LIKE
+		WHERE M_NO = #{ memberNo }
+		AND C_NO = #{ refBno }
+	</delete>
+	
+	<!-- 좋아요 삭제 (TB_CHARACTER) -->
+	<update id="deleteTbChar" parameterType="charLike">
+		UPDATE TB_CHARACTER
+		SET C_LIKE = C_LIKE - 1
+		WHERE C_NO = #{ refBno }
+	</update>
+	
+	<!-- 좋아요 삭제 (TB_CHARACTER_BOARD) -->
+	<update id="deleteTbCharBoard" parameterType="charLike">
+		UPDATE TB_CHARACTER_BOARD
+		SET CB_LIKE = CB_LIKE - 1
+		WHERE CB_NO = #{ refBno }
+	</update>
+	
+	<!-- 댓글 리스트 조회 -->
+	<select id="selectReplyList" resultMap="charReplyResultSet" parameterType="_int">
+		SELECT CR_NO
+		      ,CB_NO
+		      ,M_NAME AS CR_WRITER_NAME
+		      ,CR_GROUP_NO
+		      ,CR_PARENT_NO
+		      ,CR_STEP
+		      ,CR_LEVEL
+		      ,CR_CREATE_DATE
+		      ,LPAD('@@@@@@@@@@@@@@@@@@@@', 5*(CR_LEVEL)) || CR_CONTENT AS CR_CONTENT
+		FROM TB_CHARACTER_REPLY
+		JOIN TB_MEMBER ON(M_NO=CR_WRITER)
+		WHERE CR_STATUS = 'Y'
+		AND CB_NO = #{ refBno }
+		ORDER BY CR_GROUP_NO ASC, CR_STEP ASC
+	</select>
+		
+	<!-- 댓글 등록 -->
+	<insert id="insertReply" parameterType="charReply">
+		INSERT INTO TB_CHARACTER_REPLY(
+									   CR_NO
+									  ,CB_NO
+									  ,CR_CONTENT
+									  ,CR_WRITER
+									  ,CR_GROUP_NO
+									  ,CR_PARENT_NO
+									  ,CR_STEP
+									  ,CR_LEVEL
+									  )
+							    VALUES(
+							    	   #{ reNo }
+							    	  ,#{ refBno }
+							    	  ,#{ reContent }
+							    	  ,#{ reWriterNo }
+							    	  ,#{ reGroupNo }
+							    	  ,#{ reParentNo }
+							    	  ,#{ reStep }
+							    	  ,#{ reLevel }
+							  		  )
+	</insert>
+	
+	<!-- 댓글 수정 -->
+	<update id="updateReply" parameterType="charReply">
+		UPDATE TB_CHARACTER_REPLY
+		SET CR_CONTENT = #{ reContent }
+		WHERE CR_STATUS = 'Y'
+		AND CR_NO = #{ reNo }
+		AND CB_NO = #{ refBno }
+	</update>
+	
+	<!-- 댓글 삭제 -->
+	<update id="deleteReply" parameterType="charReply">
+		UPDATE TB_CHARACTER_REPLY
+		SET CR_STATUS = 'N'
+		WHERE CR_NO = #{ reNo }
+		AND CB_NO = #{ refBno }
+	</update>
+	
+	<!-- 댓글의 번호 생성 -->
+	<select id="replyMaxNum" resultType="_int">
+		SELECT NVL(MAX(CR_NO), 0) + 1
+		FROM TB_CHARACTER_REPLY
+	</select>
+	
+	<!-- 대댓글 (부모댓글의 그룹번호와 계층 알아오기) -->
+	<select id="replySelect" parameterType="_int" resultMap="charReplyResultSet">
+		SELECT CR_NO
+			  ,CB_NO
+			  ,CR_GROUP_NO
+			  ,CR_PARENT_NO
+			  ,CR_STEP
+			  ,CR_LEVEL
+		FROM TB_CHARACTER_REPLY
+		WHERE CR_NO = #{ reNo }
+		AND CR_STATUS = 'Y'
+	</select>
+	
+	<!-- 대댓글 (댓글중에서 새로운 댓글을 달때 맨 아래로 가기 위한 로직)  -->
+	<select id="maxStep" parameterType="_int" resultType="_int">
+		SELECT NVL(MAX(CR_STEP), 0) + 1
+		FROM TB_CHARACTER_REPLY
+		WHERE CR_GROUP_NO = #{ reGroupNo }
+	</select>
+	
+	<!-- 대댓글 (댓글의 계층을 업데이트하기 위한 로직) -->
+	<update id="updateStep" parameterType="charReply">
+		UPDATE TB_CHARACTER_REPLY
+		SET CR_STEP = CR_STEP + 1
+		WHERE CR_GROUP_NO = #{ reGroupNo }
+		AND CR_STEP > #{ reStep }
+	</update>
+	
+	<!-- 비속어 필터링 -->
+	<select id="badLanguage" resultMap="wardResultSet">
+		SELECT W_NO, W_NAME
+		FROM TB_WARD
+	</select>
+	
+</mapper>

@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="myPageMapper">
+
+	<!--마이캐릭터 글조회 -->
+	<resultMap type="myCharacter" id="myCharacterResultSet">
+		<result  property="characterNo" column="C_NO" />
+		<result  property="memberNo" column="M_NO" />
+		<result  property="characterName" column="C_NAME" />
+		<result  property="characterLike" column="C_LIKE" />
+		<result  property="characterContent" column="C_CONTENT" />
+		<result  property="cOriginName" column="C_ORIGIN_NAME" />
+		<result  property="cChangeName" column="C_CHANGE_NAME" />
+		<result  property="characterCreateDate" column="C_CREATE_DATE" />
+		<result  property="characterStatus" column="C_STATUS" />
+	
+		<result property="myCharAttachNo" column="MCA_NO"/>
+		<result property="originName" column="MCA_ORIGIN_NAME"/>
+		<result property="changeName" column="MCA_CHANGE_NAME"/>
+		<result property="myCharAttachLevel" column="MCA_CA_LEVEL"/>
+		<result property="myCharAttachCreateDate" column="MCA_CREATE_DATE"/>
+		<result property="myCharAttachStatus" column="MCA_CREATE_DATE"/>
+	</resultMap>
+	
+	<!--마이캐릭터 파일조회 -->
+	<resultMap type="myCharacterAttach" id="myCharacterAttachResultSet" >
+		<result  property="myCharAttachNo" column="MCA_NO" />
+		<result  property="characterNo" column="C_NO" />
+		<result  property="originName" column="MCA_ORIGIN_NAME" />
+		<result  property="changeName" column="MCA_CHANGE_NAME" />
+		<result  property="myCharAttachLevel" column="MCA_CA_LEVEL" />
+		<result  property="myCharAttachCreateDate" column="MCA_CREATE_DATE" />
+		<result  property="myCharAttachStatus" column="MCA_STATUS" />
+	</resultMap>
+	
+	
+	<!-- 주문조회 +배송 JOIN-->
+	<resultMap type="myOrderDetail" id="myOrderDetailResultSet">
+		<result property="orderNo" column="O_NO"/>
+		<result property="memberNo" column="M_NO"/>
+		<result property="deliveryNo" column="D_NO"/>
+		<result property="orderDate" column="O_DATE"/>
+		<result property="orderFinalAmount" column="O_FINAL_AMOUNT"/>
+		<result property="orderInvoidNo" column="O_INVOICE_NO"/>
+		<result property="orderReceiverName" column="O_RECEIVER_NAME"/>
+		<result property="orderAddress" column="O_ADDRESS"/>
+		<result property="orderAddressDetail" column="O_ADDRESS_DETAIL"/>
+		<result property="orderZipCode" column="O_ZIP_CODE"/>
+		<result property="orderComment" column="O_COMMENT"/>
+		<result property="orderPhone" column="O_PHONE"/>
+		<result property="orderPackage" column="O_PA"/>
+		<result property="orderDeliveryStatus" column="O_DELIVERY_STATUS"/>
+		<result property="orderStatus" column="O_STATUS"/>
+		
+		<result property="orderDetailNo" column="OD_NO"/>
+		<result property="goodsNo" column="G_NO"/>
+		<result property="goodsPrice" column="G_PRICE"/>
+		<result property="quantity" column="QUANTITY"/>
+		<result property="option1" column="OPTION1"/>
+		<result property="option2" column="OPTION2"/>		
+		
+		<result property="goodsName" column="G_NAME"/>
+		<result property="goodsOriginName" column="G_ORIGIN_NAME1"/>
+		<result property="goodsChangeName" column="G_CHANGE_NAME1"/>
+		<result property="goodsFilePath" column="G_FILE_PATH"/>
+		
+		<result property="deliveryName" column="D_NAME"/>
+		<result property="deliveryFee" column="D_FEE"/>
+	</resultMap>
+	
+	<!-- 주문상세 JOIN 캐릭터-->
+	<resultMap type="orderDetail" id="orderDetailResultSet">
+		<result property="orderDetailNo" column="OD_NO"/>
+		<result property="orderNo" column="O_NO" />
+		<result property="goodsNo" column="G_NO"/>
+		<result property="goodsPrice" column="G_PRICE"/>
+		<result property="quantity" column="QUANTITY"/>
+		<result property="option1" column="OPTION1"/>
+		<result property="option2" column="OPTION2"/>
+		
+		<result property="goodsName" column="G_NAME"/>
+		<result property="goodsOriginName" column="G_ORIGIN_NAME1"/>
+		<result property="goodsChangeName" column="G_CHANGE_NAME1"/>
+		<result property="goodsFilePath" column="G_FILE_PATH"/>
+	</resultMap>
+	
+	
+	<resultMap type="deliveryDetail" id="deliveryDetailResultSet">
+	  <result  property="deliveryNo" column="D_NO" />
+	  <result  property="deliveryName" column="D_NAME" />
+	  <result  property="deliveryFee" column="D_FEE" />
+	  <result  property="orderInvoidNo" column="O_INVOICE_NO" />
+	  <result  property="orderReceiverName" column="O_RECEIVER_NAME" />
+	  <result  property="orderAddress" column="O_ADDRESS" />
+	  <result  property="orderAddressDetail" column="O_ADDRESS_DETAIL" />
+	  <result  property="orderZipCode" column="O_ZIP_CODE" />
+	  <result  property="orderComment" column="O_COMMENT" />
+	  <result  property="orderPhone" column="O_PHONE" />
+	  <result  property="orderPackage" column="O_PA" />
+	  <result  property="orderDeliveryStatus" column="O_DELIVERY_STATUS" />
+	  <result  property="orderStatus" column="O_STATUS" />
+	  <result  property="orderDetailNo" column="OD_NO" />
+	</resultMap>
+	
+	<resultMap type="wishGoods" id="wishGoodsResultSet">
+		<result property="memberNo" column="M_NO"/>
+		<result property="cartNo" column="CART_NO"/>
+		<result property="quantity" column="QUANTITY"/>
+		<result property="option1" column="OPTION1"/>
+		<result property="option2" column="OPTION2"/>
+		
+		<result property="goodsNo" column="G_NO"/>
+		<result property="characterNo" column="C_NO"/>
+		<result property="goodsName" column="G_NAME"/>
+		<result property="goodsCategory" column="G_CATEGORY"/>
+		<result property="goodsStock" column="G_STOCK"/>
+		<result property="goodsPrice" column="G_PRICE"/>
+		<result property="goodsContent" column="G_CONTENT"/>
+		<result property="goodsOriginName1" column="G_ORIGIN_NAME1"/>
+		<result property="goodsChangeName1" column="G_CHANGE_NAME1"/>
+		<result property="goodsFilePath" column="G_FILE_PATH"/>
+		<result property="goodsStatus" column="G_STATUS"/>
+	</resultMap>
+	
+	<!--주문 -->
+	<resultMap type="order" id="orderResultSet">
+		<result  property="orderNo" column="O_NO"/>	
+		<result  property="memberNo" column="M_NO"/>	
+		<result  property="deliveryNo" column="D_NO"/>	
+		<result  property="orderDate" column="O_DATE"/>	
+		<result  property="orderFinalAmount" column="O_FINAL_AMOUNT"/>	
+		<result  property="orderInvoidNo" column="O_INVOICE_NO"/>	
+		<result  property="orderReceiverName" column="O_RECEIVER_NAME"/>	
+		<result  property="orderAddress" column="O_ADDRESS"/>	
+		<result  property="orderAddressDetail" column="O_ADDRESS_DETAIL"/>	
+		<result  property="orderZipCode" column="O_ZIP_CODE"/>	
+		<result  property="orderComment" column="O_COMMENT"/>	
+		<result  property="orderPhone" column="O_PHONE"/>
+		<result  property="orderPackage" column="O_PA" />
+		<result property="orderDetailStatus" column="O_DELIVERY_STATUS"/>	
+		<result property="orderStatus" column="O_STATUS"/>
+			
+		<result property="delveryNo" column="D_NO"/>	
+		<result property="deliveryName" column="D_NAME"/>	
+		<result property="deliveryFee" column="D_FEE"/>	
+	</resultMap>
+	
+	
+	<resultMap type="wishGoods" id="WishListResultSet">
+	    <result property="memberNo" column="M_NO"/>
+	    <result property="goodsNo" column="G_NO"/>
+	    
+	    <result  property="cartNo" column="CART_NO"/>
+	    <result  property="quantity" column="QUANTITY"/>
+	    <result  property="option1" column="OPTION1"/>
+	    <result  property="option2" column="OPTION2"/>
+	    
+	    <result property="characterNo" column="C_NO"/>
+	    <result property="goodsName" column="G_NAME"/>
+	    <result property="goodsCategory" column="G_CATEGORY"/>
+	    <result property="goodsStock" column="G_STOCK"/>
+	    <result property="goodsPrice" column="G_PRICE"/>
+	    <result property="goodsContent" column="G_CONTENT"/>
+	    <result property="goodsOriginName1" column="G_ORIGIN_NAME1"/>
+	    <result property="goodsChangeName1" column="G_CHANGE_NAME1"/>
+	    <result property="goodsFilePath" column="G_FILE_PATH"/>
+	    <result property="goodsStatus" column="G_STATUS"/>
+	</resultMap>
+	
+	<!-- 캐릭터별 좋아요조회 -->
+	<resultMap type="mycharacterData" id="selectDataListResult">
+	    <result property="charNo" column="C_NO"/>
+	    <result property="memberNo" column="M_NO"/>
+	    <result property="charName" column="C_NAME"/>
+	    <result property="charLike" column="C_LIKE"/>
+	    <result property="charContent" column="C_CONTENT"/>
+	    <result property="charCreateDate" column="C_CREATE_DATE"/>
+	    <result property="charStatus" column="C_STATUS"/>
+	</resultMap>
+	
+	<!--마이캐릭터 글목록 조회 -->
+	<select id="selectchaList" resultMap="myCharacterResultSet">
+		SELECT C_NO,C_NAME,C_CREATE_DATE,MCA_CHANGE_NAME,MCA_ORIGIN_NAME
+		FROM TB_CHARACTER
+		JOIN TB_MYCHARACTER_ATTACH USING(C_NO)
+		WHERE M_NO=#{memberNo}
+		AND MCA_LEVEL=1
+		AND MCA_STATUS='Y'
+	</select>
+
+     <!--입력 1. 마이캐릭터 게시글 -->
+	<insert id="mycharInsert">
+			INSERT INTO TB_CHARACTER (
+		    C_NO,
+		    M_NO,
+		    C_NAME,
+		    C_CONTENT
+		) VALUES (
+		    SEQ_CNO.NEXTVAL,
+		    #{memberNo},
+		    #{characterName},
+		    #{characterContent}
+		)
+	</insert>
+	 
+	 
+	 <!--입력 2. 마이캐릭터 파일리스트  -->
+	<insert id="mycharAtInsert" parameterType="myCharacterAttach">
+		INSERT INTO TB_MYCHARACTER_ATTACH (
+		    MCA_NO,
+		    C_NO,
+		    MCA_ORIGIN_NAME,
+		    MCA_CHANGE_NAME,
+		    MCA_LEVEL
+		) VALUES (
+		    SEQ_MCA_NO.NEXTVAL,
+		    SEQ_CNO.CURRVAL,
+		    #{originName},
+		    #{changeName},
+		    #{myCharAttachLevel}
+		)
+	</insert> 
+	
+	<!-- 마이캐릭터 상세조회수 증가 -->
+	<update id="increaseCount" parameterType="_int">
+	UPDATE TB_CHARACTER
+	SET  C_COUNT=C_COUNT+1 
+	WHERE C_NO = #{characterNo};
+	</update>
+	
+	
+	<!--마이캐릭글 상세조회-->
+	<select id="selecectMyChar" resultMap="myCharacterResultSet">
+		SELECT * 
+		FROM TB_CHARACTER
+		WHERE C_NO=#{characterNo}
+	</select>
+	
+	
+	<!--마이캐릭터글 상세조회 파일 -->
+	<select id="selectMyCharList" resultMap="myCharacterAttachResultSet">
+		SELECT * 
+		FROM TB_MYCHARACTER_ATTACH
+		WHERE C_NO=#{characterNo}
+		AND MCA_STATUS='Y'
+	</select>
+	
+	<!-- 게시글 수정 -->
+	<update id="updateMyChar" parameterType="myCharacter">		
+	    UPDATE TB_CHARACTER
+	    SET C_NAME = #{ characterName },
+        C_CONTENT = #{ characterContent }
+	    WHERE C_STATUS = 'Y'
+	    AND C_NO = #{ characterNo }
+	</update>
+
+   <!--첨부파일 수정 -->
+   <update id="updateMyCharAttach" parameterType="myCharacterAttach">
+	   UPDATE TB_MYCHARACTER_ATTACH
+	   SET MCA_ORIGIN_NAME=#{originName},
+	   MCA_CHANGE_NAME=#{changeName}
+	   WHERE MCA_STATUS='Y'
+	   AND C_NO=#{characterNo}
+   </update>
+   
+   
+   <!-- 게시글 삭제 -->
+   <update id="deleteMyChar" parameterType="_int">
+	   UPDATE TB_CHARACTER
+	   SET C_STATUS='N'
+	   WHERE C_NO=#{characterNo}
+   </update>
+   
+   <!-- 첨부파일 삭제 -->
+   <delete id="deleteMyCharAttach" parameterType="_int">
+	    DELETE FROM TB_MYCHARACTER_ATTACH   
+	    WHERE  C_NO=#{characterNo}
+   </delete>
+   
+     
+   <!--주문상세조회 /주문과 배송비 JOIN-->
+   <select id="selectMyOrderDetail" resultMap="myOrderDetailResultSet">
+	   SELECT O_NO,O_DATE,O_FINAL_AMOUNT,O_ADDRESS,O_STATUS
+	   FROM TB_ORDER O
+	   WHERE O_NO=#{orderNo}
+   </select>
+   
+   <!--주문상세 조회 /굿즈와 상세주문 JOIN-->
+   <select id="selectOrderDetail" resultMap="orderDetailResultSet">
+	   SELECT 
+	   G_NO,G.G_NAME,G.G_ORIGIN_NAME1,G.G_CHANGE_NAME1,G.G_FILE_PATH,O.OD_NO,O.O_NO,G.G_PRICE,O.QUANTITY,OPTION1,OPTION2
+	   FROM TB_ORDER_DETAIL O
+	   JOIN TB_GOODS G USING(G_NO)
+	   WHERE O_NO=#{orderNo} 
+   </select>
+   
+   <!--주문번호 얻기용 select-->
+   <select id="selectOnoFromOrderDetail" resultMap="orderDetailResultSet">
+      SELECT O_NO 
+      FROM TB_ORDER_DETAIL
+	  WHERE OD_NO=#{odNo}   
+   </select>  
+   
+   
+   <!-- 배송조회용 -->
+   <select id="selectDeliveryDetail" resultMap="deliveryDetailResultSet" parameterType="orderDetail"> 
+	    SELECT 
+			O_INVOICE_NO,
+			O_RECEIVER_NAME,
+			O_ADDRESS,
+			O_ADDRESS_DETAIL,
+			O_ZIP_CODE,
+			O_COMMENT,
+			O_PHONE,
+			O_DELIVERY_COMPANY,
+			O_DELIVERY_STATUS,
+			O_STATUS
+		FROM TB_ORDER 
+		WHERE O_NO=#{orderNo}
+   </select>
+   
+   <!-- 기간별 날짜 조회 1. 주문번호 먼저 가져옴-->
+   <select id="selectOrderListView" resultMap="orderResultSet"  parameterType="orderListByDate">
+	     SELECT O_NO
+	     FROM TB_ORDER
+		 WHERE M_NO=#{memberNo}
+		 AND O_DATE BETWEEN #{startDate} AND #{endDate} 
+   </select> 
+   
+   <!--기간별 날짜조회 2. 실제주문리스트 가져옴-->
+   <select id="selectRealOrderListView"  resultMap="myOrderDetailResultSet" parameterType="_int">
+        SELECT ROWNUM,A.*
+        FROM(SELECT O_NO,O_DATE,G_NO,G.G_NAME,G_ORIGIN_NAME1,G_CHANGE_NAME1,G_FILE_PATH,G.G_PRICE
+            FROM TB_ORDER O
+            JOIN TB_ORDER_DETAIL OD USING(O_NO)
+            JOIN TB_GOODS G USING(G_NO)
+            WHERE O_NO=#{orderNo}
+            AND O_STATUS='Y'
+            ORDER BY O_DATE DESC)A
+        WHERE ROWNUM=1
+   </select>
+   
+   <!-- 마이페이지 들어갈때 주문목록조회 -->
+   <select id="MypageSelectOrderListView" resultMap="myOrderDetailResultSet" parameterType="_int">
+      <![CDATA[
+        SELECT A.*
+        FROM(SELECT G_NO,O_DATE, O_NO,G_NAME,G_ORIGIN_NAME1,G_CHANGE_NAME1,G_FILE_PATH,G.G_PRICE
+		FROM TB_GOODS G
+		JOIN TB_ORDER_DETAIL OD USING(G_NO)
+		JOIN TB_ORDER O USING(O_NO)
+		WHERE M_NO=#{memberNo}
+		AND G_STATUS='Y'
+		ORDER BY G.G_PRICE DESC)A
+		WHERE ROWNUM<6
+	  ]]>	
+   </select>
+   
+    <!-- 위시리스트 조회 -->
+	<select id="selectWishList" resultMap="WishListResultSet" >
+		SELECT G_NO,G_NAME,G_PRICE,G_ORIGIN_NAME1,G_CHANGE_NAME1,G_FILE_PATH
+		FROM TB_GOODS
+		JOIN TB_WISH USING(G_NO)
+		WHERE M_NO=#{memberNo}
+		AND G_STATUS='Y'
+	</select>
+	
+	<!-- 위시리스트 삭제 -->
+	<delete id="deleteWishList" parameterType="wish">
+		 DELETE FROM TB_WISH
+		 WHERE G_NO=#{goodsNo}
+		 AND M_NO=#{memberNo}
+	</delete >
+	
+   <!--캐릭터별 좋아요 조회 일단 상위5위까지 select-->
+   <select id="selectDataList" resultMap="selectDataListResult">
+	   <![CDATA[
+		SELECT A.*
+		FROM(SELECT C_NAME,C_LIKE
+		FROM TB_CHARACTER
+		WHERE M_NO=#{memberNo}
+		ORDER BY C_LIKE DESC)A
+		WHERE ROWNUM<6
+	  ]]>	
+   </select>
+   
+   <!-- 카트리스트 조회-->
+	<select id="selectCartList" resultMap="wishGoodsResultSet" parameterType="_int" >
+		SELECT * FROM TB_CART
+		JOIN TB_GOODS USING(G_NO)
+		WHERE M_NO=#{memberNo}
+		AND G_STATUS='Y'
+	</select>   
+
+   <!--1. 카트리스트 추가 -->
+   <select id="findCartGoods"  resultType="String" parameterType="cart">
+		SELECT DECODE(COUNT(*),0,'false','true') 
+		FROM TB_CART
+		WHERE G_NO=#{goodsNo}
+		AND M_NO=#{memberNo}
+   </select>
+   
+   <!--2. 카트리스트 추가 -->
+   <insert id="addCartGoods"  parameterType="cart">
+   	    INSERT INTO TB_CART(CART_NO,M_NO,G_NO)
+   	    VALUES(SEQ_CARTNO.NEXTVAL,#{memberNo},#{goodsNo})
+   </insert>
+   
+</mapper>

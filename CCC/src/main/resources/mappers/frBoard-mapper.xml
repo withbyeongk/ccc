@@ -1,0 +1,503 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="frBoardMapper">
+  
+  <!-- 아래는 게시글 갯수 -->
+	<select id="selectListCount" resultType="_int">
+	SELECT  COUNT(*)
+ 	 	FROM TB_FREE
+  	WHERE F_STATUS='Y'
+	</select>
+	
+  	<!-- 아래는 지은이 꺼 Member -->
+  	<resultMap type="member" id="memberResultSet">
+	<result column="M_NO" property="memberNo" />
+	<result column="M_ID" property="memberId" />
+	<result column="M_PWD" property="memberPwd"/>
+	<result column="M_NAME" property="memberName" />
+	<result column="MG_NO" property="memberGradeNo" />
+	<result column="M_EMAIL" property="memberEmail" />
+	<result column="M_PHONE" property="memberPhone" />
+	<result column="M_ADDRESS" property="memberAddress"/>
+	<result column="M_GENDER" property="memberGender"/>
+	<result column="M_AGE" property="memberAge" />
+	<result column="M_CREATE_DATE" property="memberCreateDate" />
+	<result column="M_UPDATE_DATE" property="memberUpdateDate" />
+	<result column="M_DELETE_DATE" property="memberDeleteDate" />
+	<result column="M_POINT" property="memberPoint" />
+	<result column="M_STATUS" property="memberStatus" />
+	</resultMap>
+  
+    <!--//게시글 조회 메소드  게시글 전체 -->
+  	<resultMap type="frBoard" id="frBoardResultSet">
+  	<result column="F_NO" property="fNo"/>
+   	<result column="F_WRITER" property="fWriterNo"/>
+   	<result column="F_TYPE" property="fType"/>
+   	<result column="F_TITLE" property="fTitle"/>
+   	<result column="F_CONTENT" property="fContent"/>
+   	<result column="F_COUNT" property="fCount"/>
+   	<result column="F_CREATE_DATE" property="fCreateDate"/>
+   	<result column="F_UPDATE_DATE" property="fUpdateDate"/>
+   	<result column="F_DELETE_DATE" property="fDeleteDate"/>
+    <result column="F_STATUS" property="fStatus"/>
+  	</resultMap>
+  	
+  	<!-- 아ㅏ래는 attach  -->
+  	
+  	<resultMap type="frAttBoard" id="frAttBoardResultSet">
+  	
+  	<result column="FA_NO" property="faNo"/>
+   	<result column="F_NO" property="fNo"/>
+   	<result column="FA_ORIGIN_NAME" property="faOrginName"/>
+   	<result column="FA_CHANGE_NAME" property="faChangeName"/>
+   	<result column="FA_FILE_PATH" property="faFilePath"/>
+   	<result column="FA_STATUS" property="faStatus"/>
+   	
+   	</resultMap>
+   	
+   	
+	<!-- 아ㅏ래는 댓글 FrBoardReply  -->
+  	
+  	<resultMap type="FrBoardReply" id="frReplyBoardResultSet">
+  	
+  	<result column="FR_NO" property="frNo"/>
+  	<result column="F_NO" property="fNo"/>
+   	<result column="FR_WRITER" property="fWriterNo"/>
+   	<result column="FR_CONTENT" property="frContent"/>
+   	<result column="FR_PARENT_NO" property="frParentNo"/>
+   	<result column="FR_LEVEL" property="frLevel"/>
+   	<result column="FR_CREATE_DATE" property="frCreateDate"/>
+ 	<result column="FR_UPDATE_DATE" property="frUpdateDate"/>
+   	<result column="FR_DELETE_DATE" property="frDeleteDate"/>
+   	<result column="FR_STATUS" property="frStatus"/>
+   	
+   	</resultMap>
+   	
+  	
+	<!-- 게시글 조회 -->
+	<select id="selectList" resultMap="frBoardResultSet">
+	 SELECT  	 FR.F_NO		
+                ,M.M_ID as mId
+                ,FR.F_TYPE
+                ,FR.F_TITLE
+                ,FR.F_CONTENT
+                ,FR.F_COUNT
+                ,FR.F_CREATE_DATE
+                ,FR.F_UPDATE_DATE
+                ,FR.F_DELETE_DATE
+                ,FR.F_STATUS
+    FROM TB_FREE FR,TB_MEMBER M
+    WHERE FR.F_STATUS='Y' 
+   	AND M.M_NO = FR.F_WRITER
+  	 ORDER BY FR.F_NO DESC
+	
+	</select>
+	
+		<!-- 아래는 조회수증가  -->
+	<update id="increaseCount">
+	UPDATE TB_FREE 
+	SET F_COUNT = F_COUNT+1 
+	WHERE F_NO = #{fNo}
+	AND F_STATUS ='Y'
+	</update>
+	
+	<!-- 아래는 게시판 상세보기 -->
+	<select id="frboardDetailView" resultMap="frBoardResultSet">
+	SELECT 	 FRB.F_NO
+				,FRB.F_TITLE
+				,FRB.F_CONTENT
+				,FRB.F_WRITER		
+                ,M.M_ID AS mId
+                ,FRB.F_TYPE
+				,FRB.F_COUNT	
+				,FRB.F_CREATE_DATE
+	FROM TB_FREE FRB , TB_MEMBER M
+	
+	WHERE F_STATUS='Y'
+	AND M.M_NO = FRB.F_WRITER
+	AND  FRB.F_NO = #{fNo}
+	ORDER BY FRB.F_NO DESC
+	</select>
+	
+	<!-- 아래는 게시글 상세보기 파일 -->
+		<select id="frboardAttDetailView" resultMap="frAttBoardResultSet" parameterType="java.util.List">
+	SELECT 		FA_NO
+				,F_NO
+				,FA_ORIGIN_NAME
+				,FA_CHANGE_NAME
+				,FA_FILE_PATH
+				,FA_STATUS
+	FROM TB_FREE_ATTACH
+	WHERE FA_STATUS='Y'
+		AND  F_NO = #{fNo}
+	ORDER BY F_NO DESC
+	</select>
+	
+	
+	<!--  게시글등록 1 (사진 미포함) -->
+	<insert id="insertFrBoard1">
+	INSERT INTO TB_FREE(
+						 F_NO
+						,F_TITLE			
+						,F_CONTENT	
+						,F_WRITER 
+						,F_TYPE	
+				)VALUES(
+						SEQ_FNO.NEXTVAL
+						,#{fTitle}		
+						,#{fContent}
+						,#{fWriterNo} 
+						,2
+						)	
+	</insert>
+	
+	<!--  게시글등록 2 (사진 포함) -->
+	<insert id="insertAttFrBoard2" parameterType="java.util.List">
+	INSERT INTO TB_FREE_ATTACH(
+				 FA_NO
+				,F_NO
+				,FA_ORIGIN_NAME
+				,FA_CHANGE_NAME			
+				
+	)SELECT SEQ_FANO.NEXTVAL,SEQ_FNO.CURRVAL, A.*
+		FROM (
+				<foreach collection="list" item="item" index="index" separator="union all">
+					SELECT #{ item.faOrginName }
+						  ,#{ item.faChangeName }
+					FROM SYS.DUAL	  
+				</foreach>
+			  )A
+			  
+			  
+			  
+			  
+			  
+			  
+			  
+	</insert>
+	  <!-- 아래는 게시글 삭제   -->
+		<update id="frboardDelete"  >
+			 UPDATE TB_FREE 
+			 SET F_STATUS = 'N' 
+			 WHERE F_NO = #{fNo} 
+			 AND F_STATUS = 'Y'
+	   </update>
+	   
+	   <!-- 아래는 게시글 데이터 삭제 -->
+	   <update id="frboardDbDelete">
+	    UPDATE TB_FREE_ATTACH 
+			 SET FA_STATUS = 'N' 
+			 WHERE F_NO = #{fNo} 
+			 AND FA_STATUS = 'Y'
+	   </update>
+	   
+	   
+	    <!-- 아래는 첨부파일 수정하기전에 파일삭제 null로 업데이트   -->
+		<delete id="dbDeleteUpdateFrboard">
+			DELETE FROM TB_FREE_ATTACH
+			WHERE F_NO = #{fNo} 
+			AND FA_STATUS = 'Y'
+	   </delete>
+	   
+	    <!-- 아래는 게시글 수정 (글만)  -->
+		<update id="updateFrboard1" parameterType="java.util.List">
+			 UPDATE TB_FREE 
+			 SET F_TITLE =#{fTitle},
+				 F_CONTENT = #{fContent}
+			 WHERE F_STATUS = 'Y'
+			 AND F_NO=#{fNo}
+	   </update>
+	   
+<!-- 	    아래는 게시글 수정(첨부파일1개 2개는 아래)  -->
+<!-- 		<update id="updateFrboard2" parameterType="frAttBoard"> -->
+<!-- 			 UPDATE TB_FREE_ATTACH -->
+<!-- 			 SET FA_ORIGIN_NAME = #{faOrginName}  -->
+<!-- 				,FA_CHANGE_NAME = #{faChangeName} -->
+<!-- 			 WHERE FA_STATUS = 'Y' -->
+<!-- 			 AND FA_NO = #{faNo} -->
+<!-- 	   </update> -->
+	   
+	   
+	   <!-- 	1개 첨부파일 수정 클릭후  파일 등록   -->
+		<insert id="updateFrboard2_1" parameterType="frAttBoard"> 
+				INSERT INTO TB_FREE_ATTACH(
+				 FA_NO
+				,F_NO
+				,FA_ORIGIN_NAME
+				,FA_CHANGE_NAME			
+				
+	)SELECT SEQ_FANO.NEXTVAL,SEQ_FNO.CURRVAL, A.*
+		FROM (
+					SELECT #{faOrginName }
+						  ,#{ faChangeName }
+					FROM SYS.DUAL	  
+				
+			  )A
+			  
+ 	   </insert>
+ 	   
+ 	     <!-- 2개	  첨부파일 수정 클릭후  파일 등록   -->
+		<insert id="updateFrboard2_2" parameterType="frAttBoard"> 
+			INSERT INTO TB_FREE_ATTACH(
+				 FA_NO
+				,F_NO
+				,FA_ORIGIN_NAME
+				,FA_CHANGE_NAME			
+				
+	)SELECT SEQ_FANO.NEXTVAL,SEQ_FNO.CURRVAL, A.*
+		FROM (
+					SELECT #{ faOrginName }
+						  ,#{ faChangeName }
+					FROM SYS.DUAL	  
+				
+			  )A
+			  
+			  
+ 	   </insert>
+ 	   
+ 	   
+ 	     <!-- 3개	  첨부파일 수정 클릭후  파일 등록   -->
+		<insert id="updateFrboard2_3" parameterType="frAttBoard"> 
+				INSERT INTO TB_FREE_ATTACH(
+				 FA_NO
+				,F_NO
+				,FA_ORIGIN_NAME
+				,FA_CHANGE_NAME			
+				
+	)SELECT SEQ_FANO.NEXTVAL,SEQ_FNO.CURRVAL, A.*
+		FROM (
+					SELECT #{faOrginName }
+						  ,#{ faChangeName }
+					FROM SYS.DUAL	  
+			  )A
+			  
+ 	   </insert>
+ 	   
+ 	     <!-- 4개	  첨부파일 수정 클릭후  파일 등록   -->
+		<insert id="updateFrboard2_4" parameterType="frAttBoard"> 
+				INSERT INTO TB_FREE_ATTACH(
+				 FA_NO
+				,F_NO
+				,FA_ORIGIN_NAME
+				,FA_CHANGE_NAME			
+				
+	)SELECT SEQ_FANO.NEXTVAL,SEQ_FNO.CURRVAL, A.*
+		FROM (
+					SELECT #{ faOrginName }
+						  ,#{ faChangeName }
+					FROM SYS.DUAL	  
+			  )A
+			  
+ 	   </insert>
+ 	   
+ 	   
+ 	     <!-- 5개	  첨부파일 수정 클릭후  파일 등록   -->
+		<insert id="updateFrboard2_5" parameterType="frAttBoard"> 
+				INSERT INTO TB_FREE_ATTACH(
+				 FA_NO
+				,F_NO
+				,FA_ORIGIN_NAME
+				,FA_CHANGE_NAME			
+				
+	)SELECT SEQ_FANO.NEXTVAL,SEQ_FNO.CURRVAL, A.*
+		FROM (
+					SELECT #{ item.faOrginName }
+						  ,#{ item.faChangeName }
+					FROM SYS.DUAL	  
+				
+			  )A
+			  
+ 	   </insert>
+	   
+	   
+	   
+	   <!-- 아래는 게시글 수정(첨부파일2개_) -->
+
+	   <insert id="updateFrboard3" parameterType="frAttBoard">
+<!-- 	   	INSERT INTO TB_FREE_ATTACH( -->
+<!-- 				 FA_NO -->
+<!-- 				,F_NO -->
+<!-- 				,FA_ORIGIN_NAME -->
+<!-- 				,FA_CHANGE_NAME -->
+<!-- 	   SELECT SEQ_FANO.NEXTVAL,SEQ_FNO.CURRVAL, A.* -->
+<!-- 		FROM ( -->
+			
+<!-- 					SELECT #{ faOrginName } -->
+<!-- 						  ,#{ faChangeName } -->
+<!-- 					FROM SYS.DUAL	   -->
+			
+<!-- 			  )A -->
+			  
+			  
+	  INSERT INTO TB_FREE_ATTACH 
+			  (FA_NO, F_NO, FA_ORIGIN_NAME, FA_CHANGE_NAME)
+			  
+	  SELECT SEQ_FANO.NEXTVAL, SEQ_FNO.CURRVAL, A.*
+ 	  FROM (
+        SELECT #{ faOrginName }, #{ faChangeName }
+        FROM DUAL
+      ) A;
+			  
+			  
+			  
+	   </insert>
+		
+	  <!-- 아래는 게시글 댓글 리뷰  -->  
+	   <select id="detailFrBoardReviewSelect" resultMap="frReplyBoardResultSet">
+	 	SELECT FR_NO
+	           , F_NO
+	   	       , FR_WRITER
+	           , FR_CONTENT
+	           , FR_PARENT_NO
+	           , FR_LEVEL
+	           , FR_CREATE_DATE
+	           , FR_UPDATE_DATE
+	           , FR_DELETE_DATE
+	           , FR_STATUS
+	           , M.M_ID AS mId
+		FROM TB_FREE_REPLY FR,TB_MEMBER M
+		WHERE FR.F_NO =#{fNo }
+       AND M.M_NO=FR.FR_WRITER
+		AND FR_STATUS ='Y'
+	 	
+	   </select>
+	   
+	   <!--  아래는 댓글 등록  -->
+	   <insert id="insertFrReply">
+		INSERT INTO TB_FREE_REPLY
+		
+					(FR_NO
+					,FR_CONTENT
+					,F_NO
+					,FR_WRITER
+					)
+			VALUES(
+					SEQ_FRNO.NEXTVAL
+					,#{frContent}
+					,#{fNo}
+					,#{fWriterNo}
+					)
+		</insert>
+		
+
+		
+		<!-- 아래는 댓글 수정 -->
+		<update id="frReplyModify" parameterType="FrBoardReply">
+			  UPDATE TB_FREE_REPLY 
+			  SET FR_CONTENT =#{frContent}			
+			  WHERE FR_STATUS = 'Y'
+			  AND F_NO=#{fNo}
+			  AND FR_NO=#{frNo}
+		</update>
+		
+		
+		<!-- 아래는 체크된 글 삭제  -->
+		<update id="deleteClickFrboard" parameterType="java.util.List">
+			UPDATE TB_FREE 
+			 SET F_STATUS = 'N' 
+			 WHERE F_NO IN
+			 <foreach collection="list" item="checkBoxArr" open="(" close=")" separator=",">
+		 		#{checkBoxArr}
+			</foreach>
+		
+		</update>
+		
+		
+		
+		<!-- 아래는 기존첨부파일 삭제 병철이형 부분  -->
+		<delete id="deleteFrFile">
+			DELETE FROM TB_FREE_ATTACH
+			WHERE 
+			F_NO = #{fNo}
+		
+		</delete>
+		
+		
+		<!-- 댓글 삭제  -->
+		<update id="deleteReply" >
+			  UPDATE TB_FREE_REPLY 
+			  SET FR_STATUS ='N'			
+			  WHERE FR_STATUS = 'Y'
+			  AND FR_NO=#{frNo}
+		
+		</update>
+		
+		<!-- 아래는 검색어 갯수 조회 -->
+		<select id="searchCount" parameterType="hashmap" resultType="_int">
+		SELECT  COUNT(*)
+        FROM TB_FREE FB , TB_MEMBER M 
+        WHERE M.M_NO=FB.F_WRITER
+        AND FB.F_STATUS='Y'
+		<choose>
+			<when test="category=='writer'">
+				<!--작성자 -->
+					AND M_ID 
+			</when>
+			<when test="category=='title'">
+				<!--제목 -->
+					AND F_TITLE
+			</when>
+			<otherwise>
+				<!--내용 -->
+					AND F_CONTENT
+			</otherwise>		
+		</choose>
+		<!-- 공통적으로 사용할 수 있는 구문  -->
+		LIKE '%'||#{keyword}||'%'
+		ORDER BY F_CREATE_DATE DESC
+	</select>
+		
+		
+		
+		<!-- 여기 아래는 검색 리스트 -->
+	<select id="frSearchList" parameterType="hashmap" resultMap="frBoardResultSet">
+			SELECT F_NO
+                ,F_TITLE
+                ,M_ID as mId
+                ,F_COUNT
+                ,F_CREATE_DATE
+		FROM TB_FREE FR
+        JOIN TB_MEMBER ON (F_WRITER=M_NO)
+		WHERE F_STATUS='Y'
+		<choose>
+			<when test="category=='writer'">
+				<!--작성자 -->
+					AND M_ID 
+			</when>
+			<when test="category=='title'">
+				<!--제목 -->
+					AND F_TITLE
+			</when>
+			<otherwise>
+				<!--내용 -->
+					AND F_CONTENT
+			</otherwise>		
+		</choose>
+		<!-- 공통적으로 사용할 수 있는 구문  -->
+		LIKE '%'||#{keyword}||'%'
+		ORDER BY F_CREATE_DATE DESC
+	</select>
+	
+	
+	<!-- 리플달면 답글 다는곳  -->
+	<insert id="frReReplyEnroll" parameterType="FrBoardReply" >
+		INSERT INTO TB_FREE_REPLY
+					(FR_NO
+					,FR_PARENT_NO
+					,FR_CONTENT
+					,FR_WRITER
+					,F_NO
+					)
+			VALUES(
+					SEQ_FRNO.NEXTVAL
+					,#{SEQ_FRNO.CURVAL}
+					,#{frContent}
+					,#{fNo}
+					,#{fWriterNo}
+					)
+	</insert>
+	
+</mapper>

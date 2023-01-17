@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="memberMapper">
+	
+	
+	<select id="loginMember" resultMap="memberResultSet" parameterType="member">
+	 SELECT * FROM TB_MEMBER
+	 WHERE M_ID=#{memberId}
+	 AND M_PWD=#{memberPwd}
+	 AND M_STATUS='Y'
+	</select>
+	
+	<resultMap type="member" id="memberResultSet">
+	<result column="M_NO" property="memberNo" />
+	<result column="M_ID" property="memberId" />
+	<result column="M_PWD" property="memberPwd"/>
+	<result column="M_NAME" property="memberName" />
+	<result column="MG_NO" property="memberGradeNo" />
+	<result column="M_EMAIL" property="memberEmail" />
+	<result column="M_PHONE" property="memberPhone" />
+	<result column="M_ADDRESS" property="memberAddress"/>
+	<result column="M_GENDER" property="memberGender"/>
+	<result column="M_AGE" property="memberAge" />
+	<result column="M_CREATE_DATE" property="memberCreateDate" />
+	<result column="M_UPDATE_DATE" property="memberUpdateDate" />
+	<result column="M_DELETE_DATE" property="memberDeleteDate" />
+	<result column="M_POINT" property="memberPoint" />
+	<result column="M_STATUS" property="memberStatus" />
+	</resultMap>
+	
+	<!-- 회원리스트 조회 (관리자페이지) -->
+	<select id="memberList" resultMap="memberResultSet">
+	SELECT *
+	FROM TB_MEMBER
+	WHERE M_STATUS = 'Y'
+	ORDER BY M_NO ASC
+	</select>
+	
+	<!-- 관리자 (회원수) -->
+	<select id="selectListCount" resultType="_int">
+	
+		SELECT COUNT(*)
+		FROM TB_MEMBER
+		WHERE M_STATUS = 'Y'
+	
+	</select>
+	
+	<!-- 일반회원 check회원들 차단삭제 -->
+	<update id="deleteMemberList" parameterType="java.util.List">
+		UPDATE TB_MEMBER
+		SET M_STATUS = 'N'
+		WHERE M_NAME IN
+		<foreach collection="list" item="checkBoxArr" open="(" close=")" separator=",">
+ 		#{checkBoxArr}
+		</foreach>
+	</update>
+	
+	<!-- 회원상세보기 -->
+	<select id="detailMember" resultMap="memberResultSet">
+		SELECT * 
+		FROM TB_MEMBER 
+		WHERE M_NO=#{mno} 
+		AND M_STATUS = 'Y'
+	</select>
+	
+	
+	<insert id="insertMember" parameterType="member">	
+		INSERT INTO TB_MEMBER (M_NO,M_ID,M_PWD,M_NAME,MG_NO,M_EMAIL,M_PHONE,M_ADDRESS,M_GENDER,M_AGE,M_CREATE_DATE,M_UPDATE_DATE,M_DELETE_DATE,M_POINT,M_STATUS) 
+		VALUES (SEQ_MNO.NEXTVAL,#{memberId},#{memberPwd},#{memberName},1,#{memberEmail},#{memberPhone},#{memberAddress},#{memberGender},#{memberAge},SYSDATE,SYSDATE,SYSDATE,100,'Y')
+	</insert>
+	
+	<select id="checkId" resultType="_int">
+	  SELECT COUNT(*)
+	  FROM TB_MEMBER
+	  WHERE M_ID=#{userId}
+	  AND M_STATUS='Y'
+	</select>
+	
+	
+</mapper>

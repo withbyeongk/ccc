@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="noticeMapper">
+	<select id="selectListCount" resultType="_int">
+		SELECT COUNT(*) COUNT
+		FROM TB_NOTICE
+		WHERE N_STATUS = 'Y'
+	</select>
+	<resultMap type="notice" id="noticeResult">
+  		<result column="N_NO" property="noticeNo"/>
+  		<result column="A_NAME" property="noticeWriter"/>
+  		<result column="N_TYPE" property="noticeTypeNo"/>
+  		<result column="N_TITLE" property="noticeTitle"/>
+  		<result column="N_CONTENT" property="noticeContent"/>
+  		<result column="N_COUNT" property="noticeCount"/>
+  		<result column="N_CREATE_DATE" property="noticeCreateDate"/>
+  		<result column="N_UPDATE_DATE" property="noticeUpdateDate"/>
+  		<result column="N_DELETE_DATE" property="noticeDeleteDate"/>
+  		<result column="N_STATUS" property="noticeStatus"/>
+  	</resultMap>
+	<select id="selectList" resultMap="noticeResult" parameterType="notice">
+		SELECT N_NO, A_NAME, N_TYPE, N_TITLE, N_CONTENT, N_COUNT, N_CREATE_DATE, N_UPDATE_DATE, N_DELETE_DATE, N_STATUS
+		FROM TB_NOTICE N
+		JOIN TB_ADMIN A ON (N.N_WRITER = A.A_NO)
+		WHERE N.N_STATUS = 'Y'
+		ORDER BY N.N_CREATE_DATE DESC
+	</select>
+	<insert id="insertNotice" parameterType="notice">
+		INSERT INTO TB_NOTICE(N_NO,N_WRITER,N_TYPE,N_TITLE,N_CONTENT)
+		VALUES(SEQ_NNO.NEXTVAL,#{noticeWriterNo},#{noticeTypeNo},#{noticeTitle},#{noticeContent})
+	</insert>
+	<insert id="insertNoticeAttach" parameterType="noticeAttach">
+		INSERT INTO TB_NOTICE_ATTACH(NA_NO,N_NO,NA_ORIGIN_NAME,NA_CHANGE_NAME,NA_FILE_PATH)
+		VALUES(SEQ_NANO.NEXTVAL,SEQ_NNO.CURRVAL,#{noticeAttachOriginName},#{noticeAttachChangeName},#{noticeAttachFilePath})
+	</insert>
+	<update id="increaseCount">
+		UPDATE TB_NOTICE
+	  	SET N_COUNT = N_COUNT+1
+	  	WHERE N_NO = #{nno}
+	  	AND N_STATUS = 'Y'
+	</update>
+	<select id="selectNotice" resultMap="noticeResult">
+		SELECT N_NO, A_NAME, N_TYPE, N_TITLE, N_CONTENT, N_COUNT, N_CREATE_DATE, N_UPDATE_DATE, N_DELETE_DATE, N_STATUS
+		FROM TB_NOTICE N
+		JOIN TB_ADMIN A ON (N.N_WRITER = A.A_NO)
+		WHERE N.N_STATUS = 'Y'
+			AND N.N_NO = #{nno}
+		ORDER BY N.N_CREATE_DATE DESC
+	</select>
+	<resultMap type="noticeAttach" id="noticeAttachResult">
+		<result column="NA_NO" property="noticeAttachNo"/>
+		<result column="N_NO" property="noticeNo"/>
+		<result column="NA_ORIGIN_NAME" property="noticeAttachOriginName"/>
+		<result column="NA_CHANGE_NAME" property="noticeAttachChangeName"/>
+		<result column="NA_FILE_PATH" property="noticeAttachFilePath"/>
+		<result column="NA_STATUS" property="noticeAttachStatus"/>
+	</resultMap>
+	<select id="selectNAList" resultMap="noticeAttachResult">
+		SELECT NA_NO,N_NO,NA_ORIGIN_NAME,NA_CHANGE_NAME,NA_FILE_PATH,NA_STATUS
+		FROM TB_NOTICE_ATTACH
+		WHERE NA_STATUS = 'Y'
+		    AND N_NO = #{nno}
+	</select>
+	<update id="deleteNoticeAttachByNaNo">
+		UPDATE TB_NOTICE_ATTACH
+	  	SET NA_STATUS = 'N'
+	  	WHERE NA_NO = #{noticeAttachNo}
+	  		AND NA_STATUS = 'Y'
+	</update>
+	<update id="updateNotice">
+		UPDATE TB_NOTICE
+	  	SET N_TITLE = #{noticeTitle}
+	  	   ,N_CONTENT = #{noticeContent}
+	  	 WHERE N_NO = #{noticeNo}
+	  	 	AND N_STATUS = 'Y'
+	</update>
+	<insert id="updateNoticeAttach" parameterType="noticeAttach">
+		INSERT INTO TB_NOTICE_ATTACH(NA_NO,N_NO,NA_ORIGIN_NAME,NA_CHANGE_NAME,NA_FILE_PATH)
+		VALUES(SEQ_NANO.NEXTVAL,#{noticeNo},#{noticeAttachOriginName},#{noticeAttachChangeName},#{noticeAttachFilePath})
+	</insert>
+	<update id="deleteNoticeAttachByNno">
+		UPDATE TB_NOTICE_ATTACH
+	  	SET NA_STATUS = 'N'
+	  	WHERE N_NO = #{nno}
+	  		AND NA_STATUS = 'Y'
+	</update>
+	<update id="deleteNotice">
+		UPDATE TB_NOTICE
+		SET N_STATUS = 'N'
+		WHERE N_NO = #{nno}
+			AND N_STATUS = 'Y' 
+	</update>
+</mapper>

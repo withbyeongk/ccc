@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "mybatis-3-config.dtd" >
+<configuration>
+
+	<settings>
+		<setting name="jdbcTypeForNull" value="NULL"/>
+	</settings>
+
+	<typeAliases>
+		<!-- 관리자 -->
+		<typeAlias type="com.kh.ccc.admin.model.vo.Admin" alias="admin"/>
+		<typeAlias type="com.kh.ccc.admin.model.vo.AdminAttach" alias="adminAttach"/>
+		<!-- 일반회원 -->
+		<typeAlias type="com.kh.ccc.member.model.vo.Member" alias="member"/>
+		<!-- 자유게시판 -->
+		<typeAlias type="com.kh.ccc.board.freeboard.model.vo.FrBoard" alias="FrBoard"/>
+		<typeAlias type="com.kh.ccc.board.freeboard.model.vo.FrBoardAttach" alias="frAttBoard"/>
+		<typeAlias type="com.kh.ccc.board.freeboard.model.vo.FrBoardReply" alias="FrBoardReply"/>
+		<!-- 팁 게시판 -->
+		<typeAlias type="com.kh.ccc.board.tipBoard.model.vo.TipBoard" alias="tipBoard"/>
+		<typeAlias type="com.kh.ccc.board.tipBoard.model.vo.TipAttach" alias="tipAttBoard"/>
+		<typeAlias type="com.kh.ccc.board.tipBoard.model.vo.TipReply" alias="tipReply"/>
+		<!-- 내 캐릭터 -->
+		<typeAlias type="com.kh.ccc.mypage.model.vo.MyCharacter" alias="myCharacter"/>
+		<typeAlias type="com.kh.ccc.mypage.model.vo.MyCharacterAttach" alias="myCharacterAttach"/>
+		<typeAlias type="com.kh.ccc.mypage.model.vo.MyCharacterData" alias="mycharacterData"/>
+		<!-- 모두의 캐릭터 -->
+		<typeAlias type="com.kh.ccc.board.charBoard.model.vo.CharBoard" alias="charBoard"/>
+		<typeAlias type="com.kh.ccc.board.charBoard.model.vo.Character" alias="character"/>
+		<typeAlias type="com.kh.ccc.board.charBoard.model.vo.CharAttach" alias="charAttach"/>
+		<typeAlias type="com.kh.ccc.board.charBoard.model.vo.CharLike" alias="charLike"/>
+		<typeAlias type="com.kh.ccc.board.charBoard.model.vo.CharReply" alias="charReply"/>
+		
+		<!-- 금지어 -->
+		<typeAlias type="com.kh.ccc.common.model.vo.Ward" alias="ward"/>
+		<!-- 공지사항 -->
+		<typeAlias type="com.kh.ccc.board.notice.model.vo.Notice" alias="notice"/>
+		<typeAlias type="com.kh.ccc.board.notice.model.vo.NoticeAttach" alias="noticeAttach"/>
+		<!-- 문의게시판 -->
+		<typeAlias type="com.kh.ccc.board.question.model.vo.Question" alias="question"/>
+		<typeAlias type="com.kh.ccc.board.question.model.vo.QuestionAttach" alias="questionAttach"/>
+		<typeAlias type="com.kh.ccc.board.question.model.vo.QuestionReply" alias="questionReply"/>
+		<!-- 장바구니 -->
+		<typeAlias type="com.kh.ccc.shop.cart.model.vo.Cart" alias="cart"/>
+		<!-- 배송 -->
+		<typeAlias type="com.kh.ccc.shop.shipping.model.vo.AddressInfo" alias="addressInfo"/>
+		<typeAlias type="com.kh.ccc.shop.shipping.model.vo.DeliveryDetail" alias="deliveryDetail" />
+		<!-- 굿즈 -->
+		<typeAlias type="com.kh.ccc.shop.goods.model.vo.Wish" alias="wish"/>
+		<typeAlias type="com.kh.ccc.shop.goods.model.vo.WishGoods" alias="wishGoods"/>
+		<typeAlias type="com.kh.ccc.shop.goods.model.vo.Goods" alias="goods"/>
+		<typeAlias type="com.kh.ccc.shop.goods.model.vo.GoodsReview" alias="goodsReview"/>
+		<!-- 주문 -->
+		<typeAlias type="com.kh.ccc.shop.order.model.vo.Order" alias="order"/>
+		<typeAlias type="com.kh.ccc.shop.order.model.vo.MyOrderDetail" alias="myOrderDetail"/>
+		<typeAlias type="com.kh.ccc.shop.order.model.vo.OrderDetail" alias="orderDetail"/>
+		<typeAlias type="com.kh.ccc.shop.order.model.vo.OrderListByDate" alias="orderListByDate" />
+		<typeAlias type="com.kh.ccc.shop.order.model.vo.InsertOrder" alias="insertOrder"/>
+	</typeAliases>
+	
+	<mappers>
+		<mapper resource="/mappers/tipBoard-mapper.xml"/>
+		<mapper resource="/mappers/admin-mapper.xml"/>
+		<mapper resource="/mappers/alltimeboard-mapper.xml"/>
+		<mapper resource="/mappers/goods-mapper.xml"/>
+		
+		<mapper resource="/mappers/frBoard-mapper.xml"/>
+		<mapper resource="/mappers/charBoard-mapper.xml"/>
+
+		<mapper resource="/mappers/member-mapper.xml"/>
+		<mapper resource="/mappers/myPage-mapper.xml"/>
+
+		<mapper resource="/mappers/order-mapper.xml"/>
+		
+		<mapper resource="/mappers/notice-mapper.xml"/>
+		<mapper resource="/mappers/question-mapper.xml"/>
+		<mapper resource="/mappers/cart-mapper.xml"/>
+		<mapper resource="/mappers/shipping-mapper.xml"/>
+
+	</mappers>
+	
+</configuration>

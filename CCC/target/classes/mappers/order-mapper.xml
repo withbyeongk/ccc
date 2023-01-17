@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="orderMapper">
+	<insert id="insertOrder">
+		INSERT INTO TB_ORDER(O_NO,M_NO,D_NO,O_DATE,O_FINAL_AMOUNT,O_INVOICE_NO,O_RECEIVER_NAME,O_ADDRESS
+		,O_ADDRESS_DETAIL,O_ZIP_CODE,O_COMMENT,O_PHONE,O_DELIVERY_COMPANY,O_DELIVERY_STATUS,O_STATUS)
+		VALUES(SEQ_ONO.NEXTVAL, #{memberNo}, #{deliveryNo}, SYSDATE, #{orderFinalAmount}, #{orderInvoiceNo}+SEQ_ONO.CURRVAL, #{orderReceiverName}, #{orderAddress}
+		, #{orderAddressDetail}, #{orderZipCode}, #{orderComment}, #{orderPhone}, #{orderPackage}, #{orderDetailStatus}, 'Y')
+	</insert>
+	<insert id="insertOrderDetail">
+	INSERT INTO TB_ORDER_DETAIL(OD_NO,O_NO,G_NO,G_PRICE,QUANTITY,OPTION1,OPTION2)
+		VALUES(SEQ_ODNO.NEXTVAL,SEQ_ONO.CURRVAL, #{goodsNo}, #{goodsPrice}, #{quantity}, #{option1}, #{option2})
+	</insert>
+</mapper>
