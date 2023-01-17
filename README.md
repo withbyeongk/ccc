@@ -138,6 +138,6 @@ Choose Character
 
 <br><hr>
 
-
+# 읽어주셔서 감사합니다.
 
 
