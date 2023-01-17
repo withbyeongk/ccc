@@ -138,10 +138,6 @@ Choose Character
 
 <br><hr>
 
-# 팀원 기능 설명 :
-
-
-
 
 
 
