@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="goodsMapper">
+  
+  	<!-- Goods  -->
+  	<resultMap type="goods" id="goodsResultSet">
+	  	<result column="G_NO" property="goodsNo"/>
+	   	<result column="C_NAME" property="characterName"/>
+	   	<result column="G_NAME" property="goodsName"/>
+	   	<result column="G_BRAND" property="goodsBrand"/>
+	   	<result column="G_CATEGORY" property="goodsCategory"/>
+	   	<result column="G_STOCK" property="goodsStock"/>
+	   	<result column="G_PRICE" property="goodsPrice"/>
+	   	<result column="G_CONTENT" property="goodsContent"/>
+	   	<result column="G_ORIGIN_NAME1" property="goodsOriginName1"/>
+	   	<result column="G_CHANGE_NAME1" property="goodsChangeName1"/>
+	   	<result column="G_ORIGIN_NAME2" property="goodsOriginName2"/>
+	   	<result column="G_CHANGE_NAME2" property="goodsChangeName2"/>
+	   	<result column="G_ORIGIN_NAME3" property="goodsOriginName3"/>
+	   	<result column="G_CHANGE_NAME3" property="goodsChangeName3"/>
+	   	<result column="G_ORIGIN_NAME4" property="goodsOriginName4"/>
+	   	<result column="G_CHANGE_NAME4" property="goodsChangeName4"/>
+	   	<result column="G_FILE_PATH" property="goodsFilePath"/>
+	   	<result column="G_ENROLL_DATE" property="goodsEnrollDate"/>
+	    <result column="G_STATUS" property="goodsStatus"/>
+  	</resultMap>
+  	
+  	<!-- Goods Review -->
+  	<resultMap type="goodsReview" id="goodsReviewResultSet">
+	  	<result column="GR_NO" property="grNo"/>
+	   	<result column="M_NO" property="memberNo"/>
+	   	<result column="M_NAME" property="memberName"/>
+	   	<result column="G_NO" property="goodsNo"/>
+	   	<result column="GR_SCORE" property="grScore"/>
+	   	<result column="GR_CONTENT" property="grContent"/>
+	   	<result column="GR_CREATE_DATE" property="grCreateDate"/>
+	   	<result column="GR_STATUS" property="grStatus"/>
+	   	<result column="GR_ORIGINNAME" property="originName"/>
+	   	<result column="GR_CHANGENAME" property="changeName"/>
+  	</resultMap>
+  	
+  	<!-- 리스트 조회 -->
+	<select id="selectList" resultMap="goodsResultSet">
+		SELECT G_NO
+			   ,G_BRAND
+			   ,G_NAME
+			   ,G_CATEGORY
+			   ,G_STOCK
+			   ,G_PRICE
+			   ,G_CONTENT
+			   ,G_ORIGIN_NAME1
+			   ,G_CHANGE_NAME1
+			   ,G_FILE_PATH
+			   ,G_STATUS
+		FROM TB_GOODS
+		WHERE G_STATUS='Y'
+			AND G_CATEGORY = #{category}
+		ORDER BY G_NO DESC
+	</select>
+	
+	<!-- 굿즈 등록 -->
+	<insert id="insertGoods">
+	INSERT INTO TB_GOODS(G_NO,
+		  G_BRAND,
+		  G_NAME,
+		  G_CATEGORY,
+		  G_PRICE,
+		  G_STOCK,
+		  G_ORIGIN_NAME1,
+		  G_CHANGE_NAME1,
+		  G_ORIGIN_NAME2,
+		  G_CHANGE_NAME2,
+		  G_ORIGIN_NAME3,
+		  G_CHANGE_NAME3,
+		  G_ORIGIN_NAME4,
+		  G_CHANGE_NAME4,
+		  G_FILE_PATH,
+		  G_CONTENT)
+	VALUES(SEQ_GNO.NEXTVAL
+			,#{goodsBrand}
+			,#{goodsName}
+			,#{goodsCategory}
+			,#{goodsPrice}
+			,#{goodsStock}
+			,#{goodsOriginName1}
+			,#{goodsChangeName1}
+			,#{goodsOriginName2}
+			,#{goodsChangeName2}
+			,#{goodsOriginName3}
+			,#{goodsChangeName3}
+			,#{goodsOriginName4}
+			,#{goodsChangeName4}
+			,#{goodsFilePath}
+			,#{goodsContent})
+	</insert>
+	
+	<!-- 굿즈 상세보기 -->
+	<select id="selectBoard" resultMap="goodsResultSet">
+	SELECT G_NO,
+		   G_BRAND,
+		   G_NAME,
+		   G_CATEGORY,
+		   G_PRICE,
+		   G_STOCK,
+		   G_ORIGIN_NAME1,
+		   G_CHANGE_NAME1,
+		   G_ORIGIN_NAME2,
+		   G_CHANGE_NAME2,
+		   G_ORIGIN_NAME3,
+		   G_CHANGE_NAME3,
+		   G_ORIGIN_NAME4,
+		   G_CHANGE_NAME4,
+		   G_CONTENT
+	FROM TB_GOODS
+	WHERE G_STATUS = 'Y'
+	AND G_NO = #{goodsNo}
+	</select>
+	
+	<!-- 리뷰 등록 -->
+	<insert id="insertReview">
+	INSERT INTO TB_GOODS_REVIEW (GR_NO,
+		   M_NO,
+		   G_NO,
+		   GR_SCORE,
+		   GR_CONTENT,
+		   GR_CREATE_DATE,
+		   GR_STATUS,
+		   GR_ORIGINNAME,
+		   GR_CHANGENAME)
+	VALUES(SEQ_GRNO.NEXTVAL
+			,#{memberNo}
+			,#{goodsNo}
+			,#{grScore}
+			,#{grContent}
+			,SYSDATE
+			,'Y'
+			,#{originName}
+			,#{changeName})
+	</insert>
+	
+	<!-- 리뷰 조회 -->
+	<select id="selectReviewList" resultMap="goodsReviewResultSet" parameterType="_int">
+		SELECT GR_NO
+		      ,M_NO
+		      ,M_NAME
+		      ,G_NO
+		      ,GR_SCORE
+		      ,GR_CONTENT
+		      ,GR_CREATE_DATE
+		      ,GR_STATUS
+		      ,GR_ORIGINNAME
+		      ,GR_CHANGENAME
+		FROM TB_GOODS_REVIEW
+		JOIN TB_MEMBER USING (M_NO)
+		WHERE GR_STATUS = 'Y'
+		AND G_NO = #{goodsNo}
+		ORDER BY GR_CREATE_DATE DESC
+	</select>
+	
+	
+	<!-- 검색 조회 -->
+	<select id="searchList" resultMap="goodsResultSet">
+		SELECT G_NO
+			   ,G_BRAND
+			   ,G_NAME
+			   ,G_CATEGORY
+			   ,G_STOCK
+			   ,G_PRICE
+			   ,G_CONTENT
+			   ,G_ORIGIN_NAME1
+			   ,G_CHANGE_NAME1
+			   ,G_FILE_PATH
+			   ,G_STATUS
+		FROM TB_GOODS
+		WHERE G_STATUS='Y'
+			AND G_NAME like '%' || #{keyword}||'%'
+		ORDER BY G_NO DESC
+	</select>
+	
+</mapper>

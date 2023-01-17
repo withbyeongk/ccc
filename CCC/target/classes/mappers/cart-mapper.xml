@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="cartMapper">
+	<update id="updateCartChangeQuantity">
+		UPDATE TB_CART
+	  	SET QUANTITY = #{quantity}
+	  	WHERE CART_NO = #{cartNo}
+	</update>
+	<resultMap type="cart" id="cartResult">
+  		<result column="CART_NO" property="cartNo"/>
+  		<result column="M_NO" property="memberNo"/>
+  		<result column="M_NAME" property="memberName"/>
+  		<result column="G_NO" property="goodsNo"/>
+  		<result column="QUANTITY" property="quantity"/>
+  		<result column="OPTION1" property="option1"/>
+  		<result column="OPTION2" property="option2"/>
+  		
+  		<result column="G_NAME" property="goodsName"/>
+  		<result column="G_PRICE" property="goodsPrice"/>
+  		<result column="G_STOCK" property="goodsStock"/>
+  		
+  		<result column="G_ORIGIN_NAME1" property="goodsAttachOriginName"/>
+  		<result column="G_CHANGE_NAME1" property="goodsAttachChangeName"/>
+  		<result column="G_FILE_PATH" property="goodsAttachFilePath"/>
+  	</resultMap>
+	<select id="selectCartList" resultMap="cartResult">
+		SELECT CART_NO, C.M_NO, M.M_NAME, C.G_NO, C.QUANTITY, C.OPTION1, C.OPTION2, 
+		       G.G_NAME, G.G_PRICE, G.G_STOCK, G.G_ORIGIN_NAME1, 
+		       G.G_CHANGE_NAME1, G.G_FILE_PATH
+		FROM TB_CART C
+		JOIN TB_MEMBER M ON (M.M_NO = C.M_NO)
+		JOIN TB_GOODS G ON (C.G_NO = G.G_NO)
+		WHERE C.M_NO = #{memberNo}
+		    AND G.G_STATUS = 'Y'
+	</select>
+	<select id="selectCart" resultMap="cartResult">
+		SELECT CART_NO, C.M_NO, C.G_NO, C.QUANTITY, OPTION1, OPTION2, 
+		       G.G_NAME, G.G_PRICE, G.G_STOCK
+		FROM TB_CART C
+		JOIN TB_GOODS G ON(C.G_NO = G.G_NO)
+		WHERE CART_NO = #{cartNo}
+			AND G.G_STATUS = 'Y'
+	</select>
+	<select id="selectCartByGnoMno" resultType="_int">
+		SELECT COUNT(*)
+		FROM TB_CART C
+		WHERE M_NO = #{memberNo}
+			AND G_NO = #{goodsNo}
+	</select>
+	<select id="selectCartByGoodsNo" resultMap="cartResult">
+		SELECT CART_NO, C.M_NO, C.G_NO, C.QUANTITY, OPTION1, OPTION2, 
+		       G.G_NAME, G.G_PRICE, G.G_STOCK
+		FROM TB_CART C
+		JOIN TB_GOODS G ON(C.G_NO = G.G_NO)
+		WHERE G.G_NO = #{goodsNo}
+			AND G.G_STATUS = 'Y'
+	</select>
+	
+	
+	<delete id="deleteGoodsInCart">
+		DELETE FROM TB_CART WHERE CART_NO = #{cartNo}
+	</delete>
+	<insert id="insertWish">
+		INSERT INTO TB_WISH (M_NO, G_NO)
+		VALUES( #{memberNo}, #{goodsNo} )
+	</insert>
+	<resultMap type="wish" id="wishResult">
+		<result column="M_NO" property="memberNo"/>
+		<result column="G_NO" property="goodsNo"/>
+	</resultMap>
+	<select id="selectWishList" resultMap="wishResult">
+		SELECT M_NO, G_NO
+		FROM TB_WISH
+		WHERE M_NO = #{memberNo}
+	</select>
+	<select id="checkWish" resultType="_int">
+		SELECT COUNT(*)
+		FROM TB_WISH
+		WHERE M_NO = #{memberNo}
+			AND G_NO = #{goodsNo}
+	</select>
+	<delete id="removeWish">
+		DELETE FROM TB_WISH
+		WHERE M_NO = #{memberNo}
+			AND G_NO = #{goodsNo}
+	</delete>
+	<select id="selectCartListByArray" resultMap="cartResult">
+		SELECT CART_NO, C.M_NO, M.M_NAME, C.G_NO, C.QUANTITY, C.OPTION1, C.OPTION2, 
+		       G.G_NAME, G.G_PRICE, G.G_STOCK
+		FROM TB_CART C
+		JOIN TB_MEMBER M ON (M.M_NO = C.M_NO)
+		JOIN TB_GOODS G ON (C.G_NO = G.G_NO)
+		WHERE C.M_NO = #{memberNo}
+		    AND G.G_STATUS = 'Y'
+	</select>
+	<update id="updateStock">
+		UPDATE TB_GOODS
+		SET G_STOCK = G_STOCK - #{quantity}
+		WHERE G_NO = #{goodsNo}
+	</update>
+	<insert id="insertCart">
+		INSERT INTO TB_CART (CART_NO, M_NO, G_NO, QUANTITY, OPTION1, OPTION2)
+		VALUES( SEQ_CARTNO.NEXTVAL, #{memberNo}, #{goodsNo}, #{quantity}, #{option1}, #{option2} )
+	</insert>
+</mapper>

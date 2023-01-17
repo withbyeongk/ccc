@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+   <mapper namespace="allTimeBoardMapper">
+   <!-- 아래는 캐릭터 어태취 -->
+   	<resultMap type="charAttach" id="charAttachResultSet">
+		<result column="CA_NO" property="fileNo"/>
+		<result column="CB_NO" property="refBno"/>
+		<result column="CA_ORIGIN_NAME" property="originName"/>
+		<result column="CA_CHANGE_NAME" property="changeName"/>
+		<result column="CA_LEVEL" property="level"/>
+		<result column="CA_CREATE_DATE" property="createDate"/>
+		<result column="CA_STATUS" property="status"/>
+	</resultMap>
+   
+   
+   
+   	<!--마이캐릭터 파일조회 -->
+	<resultMap type="myCharacterAttach" id="myCharacterAttachResultSet" >
+	<result  property="myCharAttachNo" column="MCA_NO" />
+	<result  property="characterNo" column="C_NO" />
+	<result  property="originName" column="MCA_ORIGIN_NAME" />
+	<result  property="changeName" column="MCA_CHANGE_NAME" />
+	<result  property="myCharAttachLevel" column="MCA_CA_LEVEL" />
+	<result  property="myCharAttachCreateDate" column="MCA_CREATE_DATE" />
+	<result  property="myCharAttachStatus" column="MCA_STATUS" />
+	</resultMap>
+   
+   
+   <resultMap type="character" id="characterResultSet">
+		<result column="C_NO" property="charNo"/>
+		<result column="M_NO" property="memberNo"/>
+		<result column="C_NAME" property="charName"/>
+		<result column="C_LIKE" property="like"/>
+		<result column="C_ORIGIN_NAME" property="originName"/>
+		<result column="C_CHANGE_NAME" property="changeName"/>
+		<result column="C_LEVEL" property="level"/>
+		<result column="C_CREATE_DATE" property="createDate"/>
+		<result column="C_STATUS" property="status"/>
+	</resultMap>
+	
+	<!-- 아래는 역대수상작 리스트 (1~3위 까지 월 별 조회  -->
+	<select id="allTimeSelectList" resultMap="characterResultSet" parameterType="java.util.List">
+	SELECT *
+		FROM
+    		(SELECT ROWNUM RNUM, A.*
+     		 FROM
+        		 (SELECT C.C_NO
+                                ,C.M_NO
+                                ,C.C_NAME
+                                ,C.C_LIKE				
+                                ,MCA.CA_CHANGE_NAME as C_CHANGE_NAME
+                                ,C.C_CREATE_DATE
+                                ,C.C_STATUS
+			  FROM TB_CHARACTER  C , TB_CHARACTER_ATTACH MCA, TB_CHARACTER_BOARD CB
+			  WHERE C_STATUS = 'Y'
+				 AND  C.C_NO = CB.C_NO
+                 AND CB.CB_NO=MCA.CB_NO
+				 AND TO_CHAR(SYSDATE, 'YY/MM') = TO_CHAR(C_CREATE_DATE,'YY/MM')
+			     ORDER BY C_LIKE DESC)A)
+		WHERE RNUM BETWEEN 1 AND 3
+	
+		</select>
+		
+		
+		<!--  파일  -->
+		<select id="myAllTimeBoard" resultMap="charAttachResultSet" parameterType="java.util.List">
+			SELECT   CA_NO
+					,CB_NO
+					,CA_ORIGIN_NAME
+					,CA_CHANGE_NAME
+					,CA_LEVEL
+					,CA_CREATE_DATE
+					,CA_STATUS
+               FROM TB_CHARACTER_ATTACH
+               WHERE CA_STATUS ='Y'
+		</select>
+	
+		<!-- 아래는 year 좋아요 -->
+		<select id="allTimeYearList" resultMap="characterResultSet" parameterType="java.util.List">
+	
+			SELECT *
+			FROM
+	    		(SELECT ROWNUM RNUM, A.*
+	     		 FROM
+	        		 (SELECT C.C_NO
+	                                ,C.M_NO
+	                                ,C.C_NAME
+	                                ,C.C_LIKE				
+	                                ,MCA.CA_CHANGE_NAME as C_CHANGE_NAME
+	                                ,C.C_CREATE_DATE
+	                                ,C.C_STATUS
+				  FROM TB_CHARACTER  C , TB_CHARACTER_ATTACH MCA, TB_CHARACTER_BOARD CB
+				  WHERE C_STATUS = 'Y'
+					 AND  C.C_NO = CB.C_NO
+	                 AND CB.CB_NO=MCA.CB_NO
+					 AND TO_CHAR(SYSDATE, 'YY') = TO_CHAR(C_CREATE_DATE,'YY')
+				     ORDER BY C_LIKE DESC)A)
+			WHERE RNUM BETWEEN 1 AND 3
+		</select>
+</mapper>
+
+	

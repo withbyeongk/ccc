@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="questionMapper">
+	<select id="selectListCount" resultType="_int">
+		SELECT COUNT(*) COUNT
+		FROM TB_QUESTION
+		WHERE Q_STATUS = 'Y'
+	</select>
+	<resultMap type="question" id="questionResult">
+  		<result column="Q_NO" property="questionNo"/>
+  		<result column="Q_LEVEL" property="questionLevel"/>
+  		<result column="M_NAME" property="questionWriter"/>
+  		<result column="Q_TYPE" property="questionTypeNo"/>
+  		<result column="Q_TITLE" property="questionTitle"/>
+  		<result column="Q_CONTENT" property="questionContent"/>
+  		<result column="Q_RESPONSE" property="questionResponse"/>
+  		<result column="Q_COUNT" property="questionCount"/>
+  		<result column="Q_CREATE_DATE" property="questionCreateDate"/>
+  		<result column="Q_UPDATE_DATE" property="questionUpdateDate"/>
+  		<result column="Q_DELETE_DATE" property="questionDeleteDate"/>
+  		<result column="Q_STATUS" property="questionStatus"/>
+  	</resultMap>
+	<select id="selectList" resultMap="questionResult" parameterType="question">
+		SELECT Q_NO, Q_LEVEL, M_NAME, Q_TYPE, Q_TITLE, Q_CONTENT, Q_RESPONSE, Q_COUNT, Q_CREATE_DATE, Q_UPDATE_DATE, Q_DELETE_DATE, Q_STATUS
+		FROM TB_QUESTION Q
+		JOIN TB_MEMBER M ON (Q.Q_WRITER = M.M_NO)
+		WHERE Q.Q_STATUS = 'Y'
+		ORDER BY Q.Q_CREATE_DATE DESC
+	</select>
+	<select id="selectMyList" resultMap="questionResult" parameterType="question">
+		SELECT Q_NO, Q_LEVEL, M_NAME, Q_TYPE, Q_TITLE, Q_CONTENT, Q_RESPONSE, Q_COUNT, Q_CREATE_DATE, Q_UPDATE_DATE, Q_DELETE_DATE, Q_STATUS
+		FROM TB_QUESTION Q
+		JOIN TB_MEMBER M ON (Q.Q_WRITER = M.M_NO)
+		WHERE Q.Q_STATUS = 'Y'
+			AND Q.Q_WRITER = #{memberNo}
+		ORDER BY Q.Q_CREATE_DATE DESC
+	</select>
+	<insert id="insertQuestion" parameterType="question">
+		INSERT INTO TB_QUESTION(Q_NO,Q_WRITER,Q_TYPE,Q_TITLE,Q_CONTENT)
+		VALUES(SEQ_QNO.NEXTVAL,#{questionWriterNo},#{questionTypeNo},#{questionTitle},#{questionContent})
+	</insert>
+	<insert id="insertQuestionAttach" parameterType="questionAttach">
+		INSERT INTO TB_QUESTION_ATTACH(QA_NO,Q_NO,QA_ORIGIN_NAME,QA_CHANGE_NAME,QA_FILE_PATH)
+		VALUES(SEQ_QANO.NEXTVAL,SEQ_QNO.CURRVAL,#{questionAttachOriginName},#{questionAttachChangeName},#{questionAttachFilePath})
+	</insert>
+	<update id="increaseCount">
+		UPDATE TB_QUESTION
+	  	SET Q_COUNT = Q_COUNT+1
+	  	WHERE Q_NO = #{qno}
+	  	AND Q_STATUS = 'Y'
+	</update>
+	<select id="selectQuestion" resultMap="questionResult">
+		SELECT Q_NO, Q_LEVEL, M_NAME, Q_TYPE, Q_TITLE, Q_CONTENT, Q_RESPONSE, Q_COUNT, Q_CREATE_DATE, Q_UPDATE_DATE, Q_DELETE_DATE, Q_STATUS
+		FROM TB_QUESTION Q
+		JOIN TB_MEMBER M ON (Q.Q_WRITER = M.M_NO)
+		WHERE Q.Q_STATUS = 'Y'
+			AND Q.Q_NO = #{qno}
+		ORDER BY Q.Q_CREATE_DATE DESC
+	</select>
+	<resultMap type="questionAttach" id="questionAttachResult">
+		<result column="QA_NO" property="questionAttachNo"/>
+		<result column="Q_NO" property="questionNo"/>
+		<result column="QA_ORIGIN_NAME" property="questionAttachOriginName"/>
+		<result column="QA_CHANGE_NAME" property="questionAttachChangeName"/>
+		<result column="QA_FILE_PATH" property="questionAttachFilePath"/>
+		<result column="QA_STATUS" property="questionAttachStatus"/>
+	</resultMap>
+	<select id="selectQAList" resultMap="questionAttachResult">
+		SELECT QA_NO,Q_NO,QA_ORIGIN_NAME,QA_CHANGE_NAME,QA_FILE_PATH,QA_STATUS
+		FROM TB_QUESTION_ATTACH
+		WHERE QA_STATUS = 'Y'
+		    AND Q_NO = #{qno}
+	</select>
+	<update id="deleteQuestionAttachByQaNo">
+		UPDATE TB_QUESTION_ATTACH
+	  	SET QA_STATUS = 'N'
+	  	WHERE QA_NO = #{questionAttachNo}
+	  		AND QA_STATUS = 'Y'
+	</update>
+	<update id="updateQuestion">
+		UPDATE TB_QUESTION
+	  	SET Q_TITLE = #{questionTitle}
+	  	   ,Q_CONTENT = #{questionContent}
+	  	 WHERE Q_NO = #{questionNo}
+	  	 	AND Q_STATUS = 'Y'
+	</update>
+	<insert id="updateQuestionAttach" parameterType="questionAttach">
+		INSERT INTO TB_QUESTION_ATTACH(QA_NO,Q_NO,QA_ORIGIN_NAME,QA_CHANGE_NAME,QA_FILE_PATH)
+		VALUES(SEQ_QANO.NEXTVAL,#{questionNo},#{questionAttachOriginName},#{questionAttachChangeName},#{questionAttachFilePath})
+	</insert>
+	<update id="deleteQuestionAttachByQno">
+		UPDATE TB_QUESTION_ATTACH
+	  	SET QA_STATUS = 'N'
+	  	WHERE Q_NO = #{qno}
+	  		AND QA_STATUS = 'Y'
+	</update>
+	<update id="deleteQuestion">
+		UPDATE TB_QUESTION
+		SET Q_STATUS = 'N'
+		WHERE Q_NO = #{qno}
+			AND Q_STATUS = 'Y' 
+	</update>
+	<update id="updateResponse">
+		UPDATE TB_QUESTION
+		SET Q_RESPONSE = #{questionResponse},
+			Q_LEVEL = 1
+		WHERE Q_NO = #{questionNo}
+			AND Q_STATUS = 'Y'
+	</update>
+</mapper>

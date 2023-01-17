@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "mybatis-3-mapper.dtd" >
+<mapper namespace="shippingMapper">
+	<insert id="insertAddressInfo">
+		INSERT INTO TB_ADDRESS_INFO(AI_ADDRESS_NO,M_NO,AI_RECEIVER_NAME,AI_ADDRESS_NAME,AI_ADDRESS,AI_ADDRESS_DETAIL,AI_ZIP_CODE,AI_COMMENT,AI_PHONE,AI_STATUS)
+		VALUES(SEQ_AINO.NEXTVAL, #{memberNo}, #{receiverName}, #{addressName}, #{address}, #{addressDetail}, #{zipCode}, #{comment}, #{phone}, #{status})
+	</insert>
+	<update id="changeState">
+		UPDATE TB_ADDRESS_INFO
+	  	SET AI_STATUS = 'N'
+	  	WHERE M_NO = #{memberNo}
+	</update>
+	<resultMap type="addressInfo" id="addressInfoResult">
+  		<result column="AI_ADDRESS_NO" property="addressNo"/>
+  		<result column="M_NO" property="memberNo"/>
+  		<result column="M_NAME" property="memberName"/>
+  		<result column="AI_RECEIVER_NAME" property="receiverName"/>
+  		<result column="AI_ADDRESS_NAME" property="addressName"/>
+  		<result column="AI_ADDRESS" property="address"/>
+  		<result column="AI_ADDRESS_DETAIL" property="addressDetail"/>
+  		<result column="AI_ZIP_CODE" property="zipCode"/>
+  		<result column="AI_COMMENT" property="comment"/>
+  		<result column="AI_PHONE" property="phone"/>
+  		<result column="AI_STATUS" property="status"/>
+  	</resultMap>
+	
+	<select id="selectListAddressInfo" resultMap="addressInfoResult">
+		SELECT AI_ADDRESS_NO,AI.M_NO,M_NAME,AI_RECEIVER_NAME,AI_ADDRESS_NAME,AI_ADDRESS,
+				AI_ADDRESS_DETAIL,AI_ZIP_CODE,AI_COMMENT,AI_PHONE,AI_STATUS
+		FROM TB_ADDRESS_INFO AI
+		JOIN TB_MEMBER M ON(M.M_NO = AI.M_NO)
+		WHERE AI.M_NO = #{memberNo}
+		ORDER BY DECODE(AI_STATUS,'Y', 1) ASC
+	</select>
+	<select id="selectAddressInfoByAddrNo" resultMap="addressInfoResult">
+		SELECT AI_ADDRESS_NO,AI.M_NO,M_NAME,AI_RECEIVER_NAME,AI_ADDRESS_NAME,AI_ADDRESS,
+				AI_ADDRESS_DETAIL,AI_ZIP_CODE,AI_COMMENT,AI_PHONE,AI_STATUS
+		FROM TB_ADDRESS_INFO AI
+		JOIN TB_MEMBER M ON(M.M_NO = AI.M_NO)
+		WHERE AI_ADDRESS_NO = #{addressInfoNo}
+	</select>
+	<update id="updateAddressInfo" parameterType="addressInfo">
+		UPDATE TB_ADDRESS_INFO
+	  	SET M_NO = #{memberNo},
+	  		AI_STATUS = #{status},
+	  		AI_RECEIVER_NAME = #{receiverName},
+	  		AI_ADDRESS_NAME = #{addressName},
+	  		AI_ADDRESS = #{address},
+	  		AI_ADDRESS_DETAIL = #{addressDetail},
+	  		AI_ZIP_CODE = #{zipCode},
+	  		AI_COMMENT = #{comment},
+	  		AI_PHONE = #{phone}
+	  	WHERE AI_ADDRESS_NO = #{addressNo}
+	</update>
+	<delete id="deleteAddressInfo">
+		DELETE FROM TB_ADDRESS_INFO
+		WHERE AI_ADDRESS_NO = #{addressNo}
+	</delete>
+</mapper>
