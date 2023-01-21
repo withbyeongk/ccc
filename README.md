@@ -119,11 +119,15 @@ Choose Character
     + 배송지 추가 및 수정 시 기본 배송지로 체크할 경우 해당 회원의 기본 배송지로 설정.
  
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/76987021/212956738-774d152c-908e-4a8a-bbbe-098d64ad87e4.png">
-  <img src="https://user-images.githubusercontent.com/76987021/212956758-3a838a98-671d-4bef-9b20-5d735c2f7b01.png">
+  <img src="https://user-images.githubusercontent.com/76987021/213858981-fb1cde61-e5ea-420a-bf3b-c15c21943997.png">
+  <img src="https://user-images.githubusercontent.com/76987021/213859032-bbb990b1-bfeb-4382-99da-c00c8d539ffe.png">
   <img src="https://user-images.githubusercontent.com/76987021/212956775-bfbb0825-2716-4063-9698-460ad4959ad9.png">
   <img src="https://user-images.githubusercontent.com/76987021/212956788-984fe58e-1692-436e-a743-a6226c7ba34c.png">
 </div>
+
+
+![image](https://user-images.githubusercontent.com/76987021/213859053-7cef1989-b616-4276-8df6-6a96764e9948.png)
+
 
 - 캐릭터 월드컵 :
     
